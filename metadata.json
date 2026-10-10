@@ -1,0 +1,6 @@
+{
+  "name": "PCSS II CubeSat Simulator",
+  "description": "High-fidelity 3U/6U CubeSat virtual twin with SGP4 orbital mechanics, 3-axis ADCS quaternion kinematics, EPS power budget, predictive debris collision modeling, and real-time telemetry.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

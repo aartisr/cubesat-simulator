@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /*
+   * PCSS II CubeSat Simulator's single source of visual truth. Existing Tailwind utility classes
+   * resolve through these tokens, so every module shares the same accessible
+   * dark palette without maintaining a parallel set of per-page colors.
+   */
+  --color-slate-950: #07111f;
+  --color-slate-900: #0f1b2d;
+  --color-slate-800: #24364d;
+  --color-slate-700: #3a4f68;
+  --color-slate-600: #a5b4c6;
+  --color-slate-500: #a5b4c6;
+  --color-slate-400: #cbd5e1;
+  --color-slate-300: #e2e8f0;
+  --color-slate-200: #f1f5f9;
+  --color-slate-100: #f8fafc;
+
+  --color-cyan-950: #083344;
+  --color-cyan-900: #164e63;
+  --color-cyan-800: #155e75;
+  --color-cyan-500: #22d3ee;
+  --color-cyan-400: #67e8f9;
+  --color-cyan-300: #a5f3fc;
+  --color-cyan-200: #cffafe;
+  --color-emerald-950: #052e2b;
+  --color-emerald-500: #34d399;
+  --color-emerald-400: #6ee7b7;
+  --color-emerald-300: #a7f3d0;
+  --color-amber-950: #451a03;
+  --color-amber-500: #f59e0b;
+  --color-amber-400: #fbbf24;
+  --color-amber-300: #fcd34d;
+  --color-rose-950: #4c0519;
+  --color-rose-500: #f43f5e;
+  --color-rose-400: #fb7185;
+  --color-rose-300: #fda4af;
+  --color-indigo-400: #a5b4fc;
+  --color-indigo-300: #c7d2fe;
+}
+
+:root {
+  color-scheme: dark;
+  --app-canvas: var(--color-slate-950);
+  --app-surface: var(--color-slate-900);
+  --app-surface-raised: var(--color-slate-800);
+  --app-border: var(--color-slate-700);
+  --app-text: var(--color-slate-100);
+  --app-text-muted: var(--color-slate-400);
+  --app-focus: var(--color-cyan-400);
+}
+
+html {
+  background: var(--app-canvas);
+}
+
+body {
+  min-width: 320px;
+  background: var(--app-canvas);
+  color: var(--app-text);
+}
+
+/* Shared primitives for new UI work; use these rather than per-page hex values. */
+@layer components {
+  .app-shell { background: var(--app-canvas); color: var(--app-text); }
+  .ui-panel { background: color-mix(in srgb, var(--app-surface) 88%, transparent); border: 1px solid var(--app-border); border-radius: 0.75rem; }
+  .ui-panel-raised { background: var(--app-surface-raised); border: 1px solid var(--app-border); border-radius: 0.75rem; }
+  .ui-muted { color: var(--app-text-muted); }
+  .ui-focus:focus-visible { outline: 2px solid var(--app-focus); outline-offset: 2px; }
+}
+
+/* Respect motion sensitivity for animated telemetry, maps, and alert indicators. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+}
+
+/* Custom scrollbar for high-density telemetry views */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(51, 65, 85, 0.7);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.9);
+}
+
+/* Radar scanline animation for ground track / debris map */
+@keyframes radar-sweep {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-radar-sweep {
+  animation: radar-sweep 8s linear infinite;
+}
