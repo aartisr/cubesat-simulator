@@ -38,7 +38,7 @@ export const DataSourcesModule: React.FC = () => {
     const manifest = {
       schemaVersion: 1,
       createdAt: new Date().toISOString(),
-      simulator: 'PCSS II CubeSat Simulator',
+      simulator: 'Astroneer CubeSat Simulator',
       selectedSatellite: { id: satellite.id, name: satellite.name, catalogId: satellite.noradId },
       orbitElements,
       dragParameters,
@@ -48,7 +48,7 @@ export const DataSourcesModule: React.FC = () => {
     const url = URL.createObjectURL(new Blob([JSON.stringify(manifest, null, 2)], { type: 'application/json' }));
     const link = document.createElement('a');
     link.href = url;
-    link.download = `pcss-ii-scenario-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+    link.download = `astroneer-scenario-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -60,7 +60,7 @@ export const DataSourcesModule: React.FC = () => {
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-cyan-300">Data sources</p>
           <h1 className="mt-1 text-xl font-bold text-white">Choose what informs this simulation</h1>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">PCSS II remains a simulator by default. Live sources add clearly labeled context; replay data is preserved locally in this browser; mission telemetry requires a project-controlled gateway.</p>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">Astroneer remains a simulator by default. Live sources add clearly labeled context; replay data is preserved locally in this browser; mission telemetry requires a project-controlled gateway.</p>
         </div>
       </div>
     </section>
@@ -96,7 +96,7 @@ export const DataSourcesModule: React.FC = () => {
           { label: 'Mission gateway', icon: RadioTower, query: mission },
         ].map(({ label, icon: Icon, query }) => <div key={label} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3"><div className="flex items-center gap-2"><Icon className="h-4 w-4 text-slate-400" /><span className="text-xs font-semibold text-slate-200">{label}</span></div><div className={`mt-3 inline-flex rounded-full border px-2 py-1 text-[10px] font-semibold ${dataSourceQualityClass(query.data?.quality)}`}>{query.isLoading ? 'CHECKING' : query.data?.quality ?? 'UNAVAILABLE'}</div><p className="mt-2 text-[11px] leading-4 text-slate-400">{query.data?.message ?? 'Checking server-side configuration…'}</p></div>)}
       </div>
-      <p className="mt-4 flex items-center gap-2 text-[11px] text-slate-500"><CircleAlert className="h-3.5 w-3.5" /> A configured gateway is not command authority. PCSS II displays normalized observations only.</p>
+      <p className="mt-4 flex items-center gap-2 text-[11px] text-slate-500"><CircleAlert className="h-3.5 w-3.5" /> A configured gateway is not command authority. Astroneer displays normalized observations only.</p>
     </section>
   </div>;
 };

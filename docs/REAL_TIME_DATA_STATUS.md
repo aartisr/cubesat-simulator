@@ -37,7 +37,7 @@ The mission response schema and secret-rotation process are defined in [MISSION_
 
 ## Known intentional limits
 
-- PCSS II does not use public catalogue data as flight-qualified ephemeris or operational collision-screening output.
+- Astroneer does not use public catalogue data as flight-qualified ephemeris or operational collision-screening output.
 - The Vercel function layer is request/response oriented. It is not a durable MQTT, NTRIP, or long-lived WebSocket ingestor.
 - Live feeds are optional context. A provider failure results in an explicit stale/unavailable state and does not stop the simulator.
 
@@ -46,4 +46,4 @@ The mission response schema and secret-rotation process are defined in [MISSION_
 - 2026-10-10: `npm run lint` passed.
 - 2026-10-10: All new Vercel Function modules passed `node --check`.
 - 2026-10-10: Using Node 22.19.0 and the public npm registry, `npm ci`, `npm run lint`, and `npm run build` all passed. The local Vite server is available at `http://localhost:3002` because ports 3000 and 3001 were already in use.
-- 2026-10-10: Added deterministic regression coverage for simulator state, physics, replay validation, feed adapters, request guards, cache policies, and mission-gateway validation. `npm run test:all` passed: 19 tests, type-check, and production build.
+- 2026-10-10: Added deterministic regression coverage for simulator state, physics, vehicle geometry, replay validation, feed adapters, request guards, cache policies, and mission-gateway validation. `npm run test:all` passed: 22 tests, type-check, and production build.

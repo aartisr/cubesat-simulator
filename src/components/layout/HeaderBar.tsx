@@ -43,7 +43,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({ onOpenDocs }) => {
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <span className="font-extrabold text-sm tracking-widest text-white uppercase font-mono">
-                PCSS II
+                ASTRONEER
               </span>
               <span className="text-slate-400">·</span>
               <span className="text-xs font-semibold text-cyan-400 tracking-wide">

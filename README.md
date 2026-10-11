@@ -1,14 +1,14 @@
-# PCSS II CubeSat Simulator
+# Astroneer CubeSat Simulator
 
 > A browser-based digital twin for exploring the coupled dynamics of a CubeSat mission—from orbit and attitude to power, thermal behavior, communications, and conjunction safety.
 
-PCSS II is an interactive simulation environment for 1U, 3U, and 6U small-satellite concepts. Its default PCSS II virtual twin is a compact 1U technology demonstrator; switching spacecraft updates the modeled body envelope, mass, drag reference area, solar-array geometry, and power capacity together. Adjust a condition, advance time, and observe the knock-on effects across the vehicle.
+Astroneer is an interactive simulation environment for 1U, 3U, and 6U small-satellite concepts. Its default Astroneer virtual twin is a compact 1U technology demonstrator; switching spacecraft updates the modeled body envelope, mass, drag reference area, solar-array geometry, and power capacity together. Adjust a condition, advance time, and observe the knock-on effects across the vehicle.
 
-**Start here:** use this README for setup and orientation, then consult the [technical monograph](DOCUMENTATION.md) for the full mathematical and operational reference.
+**Start here:** use this README for setup and orientation, then consult the [technical reference](DOCUMENTATION.md) for the full mathematical and operational reference.
 
-## Why PCSS II
+## Why Astroneer
 
-Spacecraft subsystems do not operate in isolation. A change in attitude changes solar incidence; solar incidence changes battery behavior; power dissipation changes thermal state; and orbit geometry changes both ground contact and conjunction context. PCSS II makes those dependencies visible in one place.
+Spacecraft subsystems do not operate in isolation. A change in attitude changes solar incidence; solar incidence changes battery behavior; power dissipation changes thermal state; and orbit geometry changes both ground contact and conjunction context. Astroneer makes those dependencies visible in one place.
 
 | Explore | Observe | Act |
 | --- | --- | --- |
@@ -32,7 +32,11 @@ Spacecraft subsystems do not operate in isolation. A change in attitude changes 
 4. Open a workspace—**Orbit**, **Attitude**, **Power**, **Thermal**, **Climate**, **Comms**, or **Safety**—when you want to study a specific subsystem.
 5. Use the simulation controls in the header to pause, resume, reset, or change time warp. Open **Telemetry** for the raw mission stream.
 
-The default vehicle, **PCSS-II**, is a virtual twin. Named alternate presets are educational simulation profiles; their data is not a live operational feed.
+### Inspect charts without losing context
+
+Time-series and profile charts retain their original samples while you pan or zoom with the chart navigator. Use the expand control to enter focused full-screen inspection, then press **Escape** or the restore control to return. This behavior is shared by the interactive data charts so a close look never changes simulation data or chart precision.
+
+The default vehicle, **Astroneer**, is a virtual twin. Named alternate presets are educational simulation profiles; their data is not a live operational feed.
 
 ## Architecture
 
@@ -73,7 +77,7 @@ The React interface reads a shared Zustand simulation store. The physics loop ad
 
 ## Run locally
 
-**Prerequisite:** Node.js 20.19 or newer (also declared in [`.nvmrc`](.nvmrc)).
+**Prerequisite:** Node.js 22.x (also declared in [`.nvmrc`](.nvmrc) and `package.json`).
 
 ```bash
 npm ci
@@ -94,15 +98,15 @@ npm run test:all # Run type-check, tests, and production build
 
 ## Deploy to Vercel
 
-This is a static Vite deployment. [Vercel configuration](vercel.json) installs from the lockfile, runs `npm run build`, and publishes `dist`.
+This is a Vite single-page application with optional Vercel Functions for data feeds. [Vercel configuration](vercel.json) installs from the lockfile, runs `npm run build`, publishes `dist`, and keeps `/api/*` server-side.
 
 1. Import the repository into Vercel.
-2. Use Node.js 20.19 or newer.
-3. Deploy—no production environment variables are required for the current simulation.
+2. Use Node.js 22.x.
+3. Deploy—no environment variables are required for simulation-only use. Public context feeds work without credentials; authenticated providers and a mission gateway are opt-in and use only server-side environment variables. See the [data status](docs/REAL_TIME_DATA_STATUS.md).
 
 ## Scope and responsible use
 
-PCSS II is an educational and engineering-exploration simulator. It is not a source of flight-qualified ephemerides, collision screening, command authority, or operational spacecraft telemetry. Validate any mission-critical analysis with authoritative data, approved models, and qualified review processes.
+Astroneer is an educational and engineering-exploration simulator. It is not a source of flight-qualified ephemerides, collision screening, command authority, or operational spacecraft telemetry. Validate any mission-critical analysis with authoritative data, approved models, and qualified review processes.
 
 ## License and contribution
 

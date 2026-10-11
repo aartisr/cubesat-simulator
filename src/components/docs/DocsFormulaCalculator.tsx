@@ -91,7 +91,7 @@ export const DocsFormulaCalculator: React.FC = () => {
           </div>
           <div>
             <h3 className="text-sm font-semibold text-white">Interactive Aerodynamics & Astrodynamics Calculator</h3>
-            <p className="text-xs text-slate-400">Grounded in first-principles equations from PCSS-II-SPEC-2026</p>
+            <p className="text-xs text-slate-400">Grounded in the Astroneer technical reference and first-principles equations</p>
           </div>
         </div>
 

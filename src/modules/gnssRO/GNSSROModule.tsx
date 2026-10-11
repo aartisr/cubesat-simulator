@@ -315,7 +315,7 @@ export const GNSSROModule: React.FC = () => {
                           fontFamily="monospace"
                           fontWeight="bold"
                         >
-                          PCSS-II (LEO)
+                          Astroneer (LEO)
                         </text>
                       </g>
                     );

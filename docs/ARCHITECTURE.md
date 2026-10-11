@@ -1,6 +1,6 @@
-# PCSS II Architecture and Extension Guide
+# Astroneer Architecture and Extension Guide
 
-PCSS II is organized so a new capability can be added at a clear boundary without coupling UI code to orbital physics, browser state, credentials, or third-party response shapes.
+Astroneer is organized so a new capability can be added at a clear boundary without coupling UI code to orbital physics, browser state, credentials, or third-party response shapes.
 
 ## Module boundaries
 
@@ -22,6 +22,12 @@ PCSS II is organized so a new capability can be added at a clear boundary withou
 - `components/charts/ChartViewport.tsx` provides the consistent full-screen inspection mode. New data charts should use it so expand, Escape-to-close, focus handling, and scroll locking remain uniform.
 - `components/dataSources/DataSourceFeedCard.tsx` standardizes provider mode, provenance, freshness, and source status presentation.
 - `api/_feed.js` contains the common response envelope, unavailable state, request-method guard, date selection helper, and bounded upstream fetch.
+
+## Vehicle-geometry contract
+
+`src/core/data/tleCatalog.ts` is the single source of truth for each vehicle profile. A `SatellitePreset` carries its form factor, stowed body dimensions, drag reference areas, deployed solar-wing dimensions, mass, battery capacity, and solar capacity. The store passes that same geometry into solar, thermal, drag, propulsion, and 3D visualization paths.
+
+The default **Astroneer** profile is a conceptual **1U** virtual twin (100 × 113.5 × 100 mm, 1.25 kg, 10 Wh, 5 W). It is a simulation baseline, not a claim about an as-built or flight-qualified spacecraft. Keep new vehicle-specific assumptions in the preset; do not introduce a fixed 3U/6U constant in a component or physics module.
 
 ## Adding a public context feed
 
@@ -57,9 +63,10 @@ Run `npm test` for deterministic, network-isolated regression tests or `npm run 
 | `tests/data-sources.test.ts` | Replay-manifest validation, live-context shape guards, and SHA-256 provenance checksums. |
 | `tests/api-functions.test.ts` | Vercel request guards, NOAA/CelesTrak/IERS normalization, cache directives, graceful upstream failures, and mission-gateway boundary validation. |
 | `tests/simulator-store.test.ts` | Atomic state updates, subsystem synchronization, safe satellite switching, telemetry recording, and CSV export. |
+| `tests/cubesat-geometry.test.ts` | Astroneer 1U geometry, larger-profile separation, and geometry-derived solar-face areas. |
 
 Tests mock every upstream service. They must remain deterministic and must never require provider credentials or a network connection.
 
 ## Deliberate non-goals
 
-The browser app is not a command system, a durable message broker, or a flight-qualified orbit/conjunction authority. Continuous NTRIP, MQTT, or WebSocket ingestion belongs in a dedicated mission gateway; PCSS II consumes normalized, authenticated results through its server-side boundary.
+The browser app is not a command system, a durable message broker, or a flight-qualified orbit/conjunction authority. Continuous NTRIP, MQTT, or WebSocket ingestion belongs in a dedicated mission gateway; Astroneer consumes normalized, authenticated results through its server-side boundary.

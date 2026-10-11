@@ -1,10 +1,10 @@
-# PCSS II CubeSat Simulator: Real-Time Data and High-Fidelity Roadmap
+# Astroneer CubeSat Simulator: Real-Time Data and High-Fidelity Roadmap
 
-> **Purpose.** This document defines how PCSS II can evolve from a deterministic educational simulator into a transparent hybrid digital twin. It is an engineering-exploration plan, not a flight-operations design or a source of command authority.
+> **Purpose.** This document defines how Astroneer can evolve from a deterministic educational simulator into a transparent hybrid digital twin. It is an engineering-exploration plan, not a flight-operations design or a source of command authority.
 
 ## 1. The central design decision
 
-PCSS II should preserve two separate concepts:
+Astroneer should preserve two separate concepts:
 
 - **Simulation truth** is the internally propagated state: orbit, attitude, electrical power, thermal state, communications, and fault model.
 - **Observations** are time-stamped data obtained from an outside source: a public catalogue, space-weather service, ground-station gateway, or a recorded telemetry set.
@@ -15,7 +15,7 @@ Every value originating outside the simulator must display one of these provenan
 
 | Badge | Meaning |
 | --- | --- |
-| `SIMULATED` | Produced solely by the PCSS II model. |
+| `SIMULATED` | Produced solely by the Astroneer model. |
 | `LIVE CONTEXT` | A current outside observation informs context but does not claim to be spacecraft telemetry. |
 | `REPLAY` | Recorded historical data, shown against its original event time. |
 | `MISSION TELEMETRY` | Authenticated data from a mission-controlled gateway. |
@@ -56,7 +56,7 @@ The catalogue below is deliberately broad. A provider should be enabled only aft
 
 ### 3.1 Orbit, catalogue, and conjunction context
 
-| Source | Data useful to PCSS II | Access class | Recommended use | Important constraints |
+| Source | Data useful to Astroneer | Access class | Recommended use | Important constraints |
 | --- | --- | --- | --- | --- |
 | [CelesTrak GP data](https://celestrak.org/NORAD/documentation/gp-data-formats.php) | General-perturbations elements in OMM, JSON, CSV, XML, KVN, and legacy TLE formats | Public | Selected object orbit initialization; ground track; pass prediction | Prefer OMM/JSON. Legacy TLE fields cannot represent catalog numbers above 99,999. Cache and follow the [usage policy](https://celestrak.org/usage-policy.php). |
 | [CelesTrak SATCAT](https://celestrak.org/satcat/satcat-format.php) | Object identity, launch and catalogue metadata | Public | Satellite selector and object metadata | Catalogue metadata is not telemetry. |
@@ -71,7 +71,7 @@ The catalogue below is deliberately broad. A provider should be enabled only aft
 
 ### 3.2 Solar, space weather, ionosphere, and thermosphere
 
-| Source | Data useful to PCSS II | Access class | Recommended use | Important constraints |
+| Source | Data useful to Astroneer | Access class | Recommended use | Important constraints |
 | --- | --- | --- | --- | --- |
 | [NOAA SWPC JSON products](https://services.swpc.noaa.gov/json/) | Planetary Kp, F10.7, solar wind, flare and alert products | Public | Drag, radiation, comms, and environmental-context cards | Mark source time and index cadence. These are environmental inputs, not on-board measurements. |
 | [NOAA SWPC summary products](https://services.swpc.noaa.gov/products/summary/) | Compact 10 cm flux, solar-wind speed, and magnetic-field summaries | Public | Lightweight dashboard feed | Use for display/context; retain the full product for scientific processing where needed. |
@@ -86,7 +86,7 @@ The catalogue below is deliberately broad. A provider should be enabled only aft
 
 ### 3.3 GNSS, geodesy, atmosphere, and radio occultation
 
-| Source | Data useful to PCSS II | Access class | Recommended use | Important constraints |
+| Source | Data useful to Astroneer | Access class | Recommended use | Important constraints |
 | --- | --- | --- | --- | --- |
 | [International GNSS Service Real-Time Service](https://www.igs.org/rts/) | Multi-GNSS real-time orbit, clock, bias, and ionospheric corrections | Subscription / terms | Advanced GNSS receiver and PPP simulation | Streams use NTRIP and require registration/terms. Parse through a dedicated gateway, not in the browser. |
 | [IGS RTS user access](https://www.igs.org/rts/user-access/) | Caster registration and stream access details | Registration | Connection setup | Never expose NTRIP credentials to a client bundle. |
@@ -101,7 +101,7 @@ The catalogue below is deliberately broad. A provider should be enabled only aft
 
 ### 3.4 Earth environment, radiation, imagery, and mission context
 
-| Source | Data useful to PCSS II | Access class | Recommended use | Important constraints |
+| Source | Data useful to Astroneer | Access class | Recommended use | Important constraints |
 | --- | --- | --- | --- | --- |
 | [NOAA NCEI](https://www.ncei.noaa.gov/) | Climate, ocean, geophysical, and solar/space-weather archives | Public / product dependent | Historical environment replay | Use named datasets and versioned downloads, not generic scraping. |
 | [NOAA GOES-R data](https://www.noaa.gov/jetstream/goes-r-series) | Weather imagery and selected space-weather observations | Public / product dependent | Earth/weather visualization and replay | Product endpoints and latency vary. Validate the precise product before productizing. |
@@ -113,7 +113,7 @@ The catalogue below is deliberately broad. A provider should be enabled only aft
 
 ### 3.5 Amateur/academic ground observation and receiver networks
 
-| Source | Data useful to PCSS II | Access class | Recommended use | Important constraints |
+| Source | Data useful to Astroneer | Access class | Recommended use | Important constraints |
 | --- | --- | --- | --- | --- |
 | [SatNOGS Network](https://network.satnogs.org/) | Community ground-station observation context | Public / terms | Educational pass and observation visualizations | Community observations vary in coverage and quality; do not treat as spacecraft telemetry. |
 | [SatNOGS DB](https://db.satnogs.org/) | Transmitter, satellite, and observation metadata | Public / terms | RF catalogue context | Preserve contributor attribution and data license. |
@@ -122,12 +122,12 @@ The catalogue below is deliberately broad. A provider should be enabled only aft
 
 ### 3.6 Mission-owned data: the only source of real vehicle telemetry
 
-PCSS II can support an actual mission only when the mission owner intentionally connects a controlled gateway. Recommended transports are:
+Astroneer can support an actual mission only when the mission owner intentionally connects a controlled gateway. Recommended transports are:
 
 - HTTPS pull from a mission-control API using short-lived, server-to-server credentials.
 - A verified webhook receiver for downlink events and decoded telemetry packets.
 - MQTT over TLS with a dedicated service that validates topics, client identity, payload schema, and rate limits.
-- A WebSocket or Server-Sent Events bridge from an internal telemetry service to the PCSS II client after authorization.
+- A WebSocket or Server-Sent Events bridge from an internal telemetry service to the Astroneer client after authorization.
 - Immutable archived files—CSV, JSONL, CCSDS packets, or mission-defined binary packets—for replay.
 
 Do not accept a user-supplied external URL in the browser. It invites server-side request forgery, leaking credentials, unpredictable CORS failures, and unbounded provider usage. Connections should be predefined adapters with an allow-listed upstream host and a published schema.
@@ -138,7 +138,7 @@ The Vite client remains a static interactive application. All credentials, provi
 
 ```text
                          ┌─────────────────────────────┐
-                         │        PCSS II browser       │
+                         │       Astroneer browser      │
                          │ settings · views · simulator │
                          └──────────────┬──────────────┘
                                         │ normalized, safe JSON
@@ -171,7 +171,7 @@ type FeedEnvelope<T> = {
   feedId: string;
   provenance: DataProvenance;
   observedAt: string;       // when the source says the value/event occurred
-  retrievedAt: string;      // when PCSS II obtained it
+  retrievedAt: string;      // when Astroneer obtained it
   expiresAt: string;        // after this, UI becomes STALE
   quality: 'NOMINAL' | 'SUSPECT' | 'DEGRADED' | 'UNAVAILABLE';
   units?: Record<string, string>;
@@ -257,7 +257,7 @@ The dashboard should include one compact source strip, for example: `Orbit: Scen
 | GP/OMM elements | Initialize visible orbit and pass prediction | Seed an orbit estimator with uncertainty | Exact real-time vehicle position or command-ready ephemeris |
 | Kp/F10.7/solar wind | Environment card and drag scenario parameter | Drive an atmospheric-density ensemble | Measured drag coefficient or spacecraft health |
 | IERS EOP | Frame conversion input | High-accuracy coordinate transformation | Spacecraft observation |
-| IGS RTS | GNSS subsystem fidelity exercise | PPP/SSR measurement simulation | PCSS-II receiver solution unless actual receiver data exists |
+| IGS RTS | GNSS subsystem fidelity exercise | PPP/SSR measurement simulation | Astroneer receiver solution unless actual receiver data exists |
 | GNSS-RO science data | Historical profile replay | Compare retrieval algorithms | Live payload data |
 | Ground-network reception | Community observation overlay | RF coverage/reception statistics | Authoritative telemetry |
 | Mission gateway | Status and packet display | State estimator and fault detection | Command or safety authority without an approved mission system |
@@ -334,7 +334,7 @@ A live-context release is ready when all of the following are true:
 7. A replay can be reproduced from its manifest and checksum without contacting the original provider.
 8. Source terms, attribution, and use limits are recorded alongside each enabled integration.
 
-## 10. Immediate recommendation for PCSS II
+## 10. Immediate recommendation for Astroneer
 
 Start with **NOAA SWPC**, **CelesTrak OMM/JSON**, and **IERS EOP** as a small, defensible public-data foundation. They directly improve environmental context, orbit initialization, and frame/time handling while requiring no user credential in the browser.
 

@@ -84,9 +84,9 @@ export default function App() {
         <footer className="w-full border-t border-slate-900 bg-slate-950/80 px-4 py-4 text-xs text-slate-400 sm:px-6">
           <div className="max-w-7xl mx-auto flex min-w-0 flex-col items-center justify-between gap-2 sm:flex-row">
             <div className="flex min-w-0 items-center gap-2">
-              <span className="font-semibold text-slate-400">PCSS II CUBESAT SIMULATOR</span>
+              <span className="font-semibold text-slate-400">ASTRONEER CUBESAT SIMULATOR</span>
               <span className="hidden sm:inline">·</span>
-              <span className="hidden truncate sm:inline">High-Fidelity 3U/6U CubeSat Virtual Twin & Orbital Dynamics Simulator</span>
+              <span className="hidden truncate sm:inline">1U/3U/6U CubeSat Virtual Twin & Orbital Dynamics Simulator</span>
             </div>
             <div className="hidden font-mono text-[11px] text-slate-400 md:flex md:items-center md:gap-3">
               <span>WGS-84 / ECI J2000</span>

@@ -133,7 +133,7 @@ export const DocumentationModule: React.FC = () => {
     {
       id: 'CH8_COMMS',
       number: '§8',
-      title: 'Friis Link Budget & Relativistic Doppler Tracking',
+      title: 'Friis Link Budget & Kinematic Doppler Tracking',
       shortTitle: 'RF Link Budget',
       icon: Radio,
       tag: 'Telecommunications',
@@ -157,8 +157,8 @@ export const DocumentationModule: React.FC = () => {
     {
       id: 'CH11_CHECKLISTS',
       number: '§11',
-      title: 'Flight Operations Procedures & FDIR Checklists',
-      shortTitle: 'Flight Checklists',
+      title: 'Simulation Operations & FDIR Exploration Checklists',
+      shortTitle: 'Simulation Checklists',
       icon: ListChecks,
       tag: 'Operations',
     },
@@ -186,14 +186,14 @@ export const DocumentationModule: React.FC = () => {
 
   // BibTeX Citation Copy handler
   const handleCopyBibtex = () => {
-    const bibtex = `@techreport{pcss_ii_cubesat_simulator_spec_2026,
-  author      = {PCSS II CubeSat Simulator Virtual Twin Flight Systems Team},
-  title       = {High-Fidelity 3U/6U CubeSat Virtual Twin and Multi-Physics Orbital Dynamics Simulation System},
-  institution = {PCSS II Aerospace & Orbital Dynamics Directorate},
-  number      = {PCSS-II-SPEC-2026-REV-4.2},
+    const bibtex = `@techreport{astroneer_cubesat_simulator_reference_2026,
+  author      = {Astroneer CubeSat Simulator Virtual Twin Team},
+  title       = {1U, 3U, and 6U CubeSat Virtual-Twin and Multi-Physics Simulation System},
+  institution = {Astroneer Aerospace & Orbital Dynamics Directorate},
+  number      = {ASTRONEER-REFERENCE-2026-REV-5.0},
   year        = {2026},
   month       = {October},
-  note        = {Open Aerospace Standard AIAA/CCSDS compliant}
+  note        = {Engineering exploration reference; not flight-operations authority}
 }`;
     navigator.clipboard.writeText(bibtex);
     setCopiedBibtex(true);
@@ -204,7 +204,7 @@ export const DocumentationModule: React.FC = () => {
   const handleDownloadMarkdown = () => {
     const link = document.createElement('a');
     link.href = '/DOCUMENTATION.md';
-    link.download = 'PCSS_II_CUBESAT_SIMULATOR_SPECIFICATION.md';
+    link.download = 'ASTRONEER_CUBESAT_SIMULATOR_REFERENCE.md';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -220,11 +220,11 @@ export const DocumentationModule: React.FC = () => {
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
-                PCSS-II-SPEC-2026-REV-4.2
+                ASTRONEER-REFERENCE-2026-REV-5.0
               </span>
               <span className="text-slate-400">·</span>
               <span className="text-[11px] font-mono text-emerald-400">
-                AIAA / CCSDS COMPLIANT
+                1U / 3U / 6U PROFILES
               </span>
               <span className="text-slate-400">·</span>
               <span className="text-[11px] font-mono text-amber-400">
@@ -233,10 +233,10 @@ export const DocumentationModule: React.FC = () => {
             </div>
 
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white font-sans">
-              Technical Monograph & Flight Operations Specification
+              Technical Monograph & Simulation Reference
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 max-w-4xl leading-relaxed">
-              Comprehensive scientific monograph detailing the multi-physics mathematics, coupled astrodynamics, thermospheric fluid aerodynamics, attitude quaternion kinematics, lumped-capacitance thermodynamics, inverse Abel transform GNSS-RO sounding, and Foster-Chan orbital safety verification powering the PCSS II CubeSat Simulator CubeSat Virtual Twin.
+              A searchable engineering reference for the coupled orbit, attitude, power, thermal, communications, GNSS-RO, and conjunction models. The default Astroneer vehicle is a 1U virtual twin; selecting another profile updates its geometry-dependent model inputs together.
             </p>
           </div>
 
@@ -370,12 +370,12 @@ export const DocumentationModule: React.FC = () => {
               </div>
 
               <p className="text-sm text-slate-300">
-                <strong>PCSS II CubeSat Simulator</strong> establishes a unified, high-fidelity digital twin framework for nanosatellites operating in Low Earth Orbit (LEO). Conventional CubeSat simulators frequently isolate orbital propagation from attitude dynamics or employ highly simplified, static thermal and aerodynamic assumptions. PCSS II CubeSat Simulator bridges this computational divide by introducing an interconnected, multi-domain physics loop running on a deterministic 20 Hz cycle.
+                <strong>Astroneer CubeSat Simulator</strong> establishes a unified, high-fidelity digital twin framework for nanosatellites operating in Low Earth Orbit (LEO). Conventional CubeSat simulators frequently isolate orbital propagation from attitude dynamics or employ highly simplified, static thermal and aerodynamic assumptions. Astroneer CubeSat Simulator bridges this computational divide by introducing an interconnected, multi-domain physics loop running on a deterministic 20 Hz cycle.
               </p>
 
               <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-3">
                 <div className="text-xs font-mono font-bold text-cyan-300 uppercase tracking-wider">
-                  Key Physics Pillars of the PCSS-II Virtual Twin:
+                  Key Physics Pillars of the Astroneer Virtual Twin:
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300">
                   <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800/80">

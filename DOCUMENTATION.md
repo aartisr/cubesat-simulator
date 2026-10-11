@@ -1,30 +1,43 @@
-# PCSS II CUBESAT SIMULATOR: TECHNICAL MONOGRAPH & FLIGHT SPECIFICATION
-## High-Fidelity 3U/6U CubeSat Virtual Twin & Multi-Physics Orbital Mechanics Simulation System
-### Document Identifier: PCSS-II-SPEC-2026-REV-4.2 | Classification: Open Aerospace Standard (AIAA/CCSDS)
+# ASTRONEER CUBESAT SIMULATOR: TECHNICAL REFERENCE
+## 1U, 3U, and 6U Virtual-Twin Simulation & Multi-Physics Exploration System
+### Document Identifier: ASTRONEER-REFERENCE-2026-REV-5.0 | Classification: Engineering exploration reference
 
-> **Looking for setup, a product overview, or a guided first run?** Start with the [PCSS II CubeSat Simulator README](README.md), then return here for the detailed technical reference. For the planned integration of public, authenticated, and mission-owned feeds, see the [real-time data strategy](docs/REAL_TIME_DATA_STRATEGY.md) and its [implementation status](docs/REAL_TIME_DATA_STATUS.md).
+> **Looking for setup, a product overview, or a guided first run?** Start with the [Astroneer CubeSat Simulator README](README.md), then return here for the detailed technical reference. For the planned integration of public, authenticated, and mission-owned feeds, see the [real-time data strategy](docs/REAL_TIME_DATA_STRATEGY.md) and its [implementation status](docs/REAL_TIME_DATA_STATUS.md).
 
 ---
 
 ## EXECUTIVE SUMMARY & MISSION ARCHITECTURE
 
-**PCSS II CubeSat Simulator** represents a virtual-twin and digital-engineering platform for low-Earth-orbit (LEO) small satellites. It includes a 1U PCSS II baseline and representative 3U and 6U concepts. Their body envelopes, mass, reference area, and deployed-array geometry are selected together rather than treated as interchangeable. The platform executes coupled multi-physics simulations in real-time (20 Hz decoupled clock with variable time-warp up to 300×), modeling:
+**Astroneer CubeSat Simulator** represents a virtual-twin and digital-engineering platform for low-Earth-orbit (LEO) small satellites. It includes a 1U Astroneer baseline and representative 3U and 6U concepts. Their body envelopes, mass, reference area, and deployed-array geometry are selected together rather than treated as interchangeable. The platform executes coupled multi-physics simulations in real-time (20 Hz decoupled clock with variable time-warp up to 300×), modeling:
 
-1. **Relativistic and Perturbed Astrodynamics** (WGS-84 geodetic frame, ECI J2000 coordinates, non-spherical Earth gravity potential with $J_2$ secular nodal and apsidal precession, and high-precision Keplerian propagation).
+1. **Perturbed Astrodynamics** (WGS-84 geodetic frame, ECI coordinates, non-spherical Earth gravity potential with $J_2$ secular nodal and apsidal precession, and Keplerian propagation).
 2. **Thermospheric Fluid Aerodynamics** (Modified Harris-Priester dynamic atmospheric density model with solar $F_{10.7}$ radio flux scaling, diurnal bulge lag, attitude-dependent aerodynamic cross-sections, ballistic coefficient tracking, and orbital lifetime decay estimation).
 3. **Rigid-Body Rotational Dynamics & ADCS** (Nonlinear Euler equations of motion, 4-parameter unit quaternion kinematics $\mathbb{H}_1$, three-axis reaction wheel momentum exchange, magnetic dipole desaturation, and the classic $B$-dot magnetic detumbling law coupled with an Earth tilted dipole magnetic field).
 4. **Electrical Power & Solar Geometry** (True solar ephemeris vector derivation, dual-cylinder Earth conical/cylindrical shadow function with penumbral transitions, 6-face projected photodiode area calculations, Gallium Arsenide triple-junction photovoltaic temperature derating, and LiFePO$_4$ battery electrochemistry with Coulomb counting).
 5. **Multi-Node Lumped-Capacitance Thermal Network** (Nodal heat capacity matrix, Stefan-Boltzmann radiative exchange to deep space at $2.73\,\text{K}$, direct solar irradiance, planetary infrared albedo, inter-node conductive couplings, variable-aperture radiator louvers, bimetallic survival patch heaters, and pyrolytic graphite thermal straps).
 6. **Atmospheric GNSS Radio Occultation (GNSS-RO)** (Carrier phase Doppler shift modeling, geometric ray tracing, bending angle retrieval via the inverse Abel integral transform, Smith-Weintraub atmospheric refractivity equation, and vertical profile inversion of temperature, atmospheric pressure, and water vapor partial pressure, coupled with on-board edge-AI sounding classification).
 7. **Conjunction Assessment & Orbital Safety (CAM)** (2D $B$-plane collision coordinate frame, primary and secondary state covariance projection, Foster-Chan 2D Gaussian probability density integration over the hard-body circumscribing sphere, time-to-closest-approach (TCA) prediction, and autonomous impulse burn calculation).
-8. **RF Communications & Ground Station Telemetry** (Friis transmission link budget, free-space path loss (FSPL), atmospheric and polarization losses, carrier-to-noise density ratio $C/N_0$, bit error rate (BER) curves, relativistic Doppler frequency shifts, and an interconnected global tracking network spanning high-latitude and equatorial ground stations).
+8. **RF Communications & Ground Station Telemetry** (Friis transmission link budget, free-space path loss (FSPL), atmospheric and polarization losses, carrier-to-noise density ratio $C/N_0$, bit error rate (BER) curves, kinematic Doppler frequency shifts, and an interconnected global tracking network spanning high-latitude and equatorial ground stations).
+
+### 0.1 Active vehicle profiles and modeling boundary
+
+The selected vehicle is a first-class model input. Astroneer carries its dimensions, mass, drag areas, solar-wing envelope, battery capacity, and rated solar power through the visualization and coupled physics loop. The current profiles are:
+
+| Profile | Form factor | Stowed body envelope | Mass | Battery / solar rating |
+| --- | --- | --- | ---: | ---: |
+| Astroneer virtual twin | 1U | 100 × 113.5 × 100 mm | 1.25 kg | 10 Wh / 5 W |
+| Dove educational profile | 3U | 100 × 340.5 × 100 mm | 5.2 kg | 50 Wh / 24 W |
+| LightSail 2 educational profile | 3U | 100 × 340.5 × 100 mm | 5.0 kg | 30 Wh / 14 W |
+| BioSentinel educational profile | 6U | 226.3 × 366 × 100 mm | 13.5 kg | 95 Wh / 42 W |
+
+Astroneer is a simulator and engineering-exploration tool. The profiles are not flight-certified configuration data, operational ephemerides, collision-screening output, command authority, or mission telemetry. Validate any operational decision with mission-controlled data, qualified models, and approved review.
 
 ---
 
 ## 1. ASTRODYNAMICS & ORBITAL MECHANICS
 
 ### 1.1 Coordinate Systems & Frame Transformations
-PCSS II CubeSat Simulator rigorously models motion in three fundamental reference frames:
+Astroneer CubeSat Simulator rigorously models motion in three fundamental reference frames:
 - **Earth-Centered Inertial (ECI J2000)**: Origin at Earth's center of mass, $X$-axis pointing toward the vernal equinox at J2000.0, $Z$-axis parallel to Earth's rotational axis, and $Y$-axis completing the right-handed Cartesian orthogonal basis ($\hat{X} \times \hat{Y} = \hat{Z}$).
 - **Earth-Centered, Earth-Fixed (ECEF)**: Rotating frame co-moving with Earth's diurnal rotation at angular velocity $\omega_\oplus = 7.292115 \times 10^{-5}\,\text{rad/s}$. Transformation from ECI to ECEF is governed by the Greenwich Mean Sidereal Time (GMST) rotation matrix $\mathbf{R}_z(\theta_{\text{GMST}})$.
 - **Geodetic Coordinates (WGS-84)**: Defined by semi-major axis $a_E = 6378.137\,\text{km}$ and flattening $f = 1/298.257223563$. Altitude $h$, geodetic latitude $\phi$, and longitude $\lambda$ are retrieved via iterative Bowring algorithms.
@@ -67,7 +80,7 @@ To maintain a constant angle between the orbital plane and the Sun vector throug
 $$\dot{\Omega}_{\text{SSO}} = \frac{360^\circ}{365.2422\,\text{days}} \approx 1.99106 \times 10^{-7}\,\text{rad/s} \approx 0.9856^\circ/\text{day}$$
 Equating this to the $J_2$ drift formula specifies the exact inclination required for any given altitude $h$:
 $$\cos i_{\text{SSO}} = -\frac{2}{3} \frac{\dot{\Omega}_{\text{SSO}}}{J_2 \bar{n}} \left(\frac{a(1-e^2)}{R_E}\right)^2$$
-For PCSS-II at $h = 520\,\text{km}$ ($a = 6898.14\,\text{km}$), this yields the retrograde inclination $i \approx 97.45^\circ$.
+For Astroneer at $h = 520\,\text{km}$ ($a = 6898.14\,\text{km}$), this yields the retrograde inclination $i \approx 97.45^\circ$.
 
 ---
 
@@ -93,9 +106,7 @@ where:
 - $m$: Spacecraft wet mass ($\text{kg}$).
 - $A_{\text{eff}}$: Projected cross-sectional area perpendicular to $\mathbf{v}_{\text{rel}}$, modulated by satellite attitude:
   $$A_{\text{eff}}(\mathbf{q}) = \sum_{k=1}^6 A_k \max\left(0, (\mathbf{R}(\mathbf{q}) \hat{\mathbf{n}}_k) \cdot \frac{\mathbf{v}_{\text{rel}}}{\|\mathbf{v}_{\text{rel}}\|}\right)$$
-  For a 3U CubeSat:
-  - Minimum Drag Configuration (Ram-facing $1\text{U} \times 1\text{U}$): $A_{\text{min}} = 0.010\,\text{m}^2$
-  - Maximum Drag Configuration (Broadside $3\text{U} \times 1\text{U}$): $A_{\text{max}} = 0.030\,\text{m}^2$
+  The active vehicle supplies nominal and broadside reference areas. The default 1U Astroneer profile uses $A_{\text{nominal}} = A_{\text{broadside}} = 0.01135\,\text{m}^2$; 3U and 6U profiles use their own preset areas. The drag-sail control derives its area from the selected profile rather than a fixed bus size.
 - Ballistic coefficient $B = \frac{m}{C_d A_{\text{eff}}}$.
 
 ### 2.3 Orbital Semi-Major Axis Decay Rate
@@ -109,7 +120,7 @@ $$\Delta a_{\text{day}} = 86400 \times \frac{da}{dt}$$
 ## 3. ATTITUDE DETERMINATION & CONTROL SYSTEM (ADCS)
 
 ### 3.1 Unit Quaternion Kinematics ($\mathbb{H}_1$)
-To guarantee singularity-free orientation tracking without gimbal lock, PCSS II CubeSat Simulator represents spacecraft attitude in the unit quaternion space:
+To guarantee singularity-free orientation tracking without gimbal lock, Astroneer CubeSat Simulator represents spacecraft attitude in the unit quaternion space:
 $$\mathbf{q} = \begin{bmatrix} q_0 \\ q_1 \\ q_2 \\ q_3 \end{bmatrix} = \begin{bmatrix} \cos(\theta/2) \\ \hat{\mathbf{e}} \sin(\theta/2) \end{bmatrix}, \quad \|\mathbf{q}\|^2 = q_0^2 + q_1^2 + q_2^2 + q_3^2 = 1$$
 The kinematic time derivative coupled with the body angular velocity vector $\boldsymbol{\omega} = [\omega_x, \omega_y, \omega_z]^T$ is:
 $$\dot{\mathbf{q}} = \frac{1}{2} \boldsymbol{\Omega}(\boldsymbol{\omega}) \mathbf{q} = \frac{1}{2} \begin{bmatrix} 0 & -\omega_x & -\omega_y & -\omega_z \\ \omega_x & 0 & \omega_z & -\omega_y \\ \omega_y & -\omega_z & 0 & \omega_x \\ \omega_z & \omega_y & -\omega_x & 0 \end{bmatrix} \begin{bmatrix} q_0 \\ q_1 \\ q_2 \\ q_3 \end{bmatrix}$$
@@ -177,7 +188,7 @@ Total generated power is the superposition over all active solar array surfaces:
 $$P_{\text{solar}} = \sum_{k=1}^6 A_k \eta(T_{\text{panel}}) I_k$$
 
 ### 4.3 Battery Kinetics & State-of-Charge (SOC)
-The energy storage subsystem models an 8S lithium-iron-phosphate (LiFePO$_4$) / lithium-ion battery pack with nominal capacity $C_{\text{nom}} = 40.0\,\text{Wh}$ (expandable to $95.0\,\text{Wh}$ on 6U buses). The net battery power flow is:
+The energy-storage capacity is selected with the vehicle profile: 10 Wh for the default 1U Astroneer profile, 30–50 Wh for the included 3U profiles, and 95 Wh for the included 6U profile. The net battery power flow is:
 $$P_{\text{batt}} = P_{\text{solar}} - P_{\text{load}} - P_{\text{heaters}}$$
 When $P_{\text{batt}} > 0$, the battery charges with Coulomb efficiency $\eta_{\text{chg}} = 96\%$; when $P_{\text{batt}} < 0$, it discharges into regulated $3.3\,\text{V}$, $5.0\,\text{V}$, and $12.0\,\text{V}$ power distribution rails:
 $$\frac{d(\text{SOC})}{dt} = \begin{cases}
@@ -192,7 +203,7 @@ $$V_{\text{oc}}(\text{SOC}) = V_{\min} + (V_{\max} - V_{\min})\text{SOC}^{0.5} -
 ## 5. MULTI-NODE THERMAL CONTROL SYSTEM (TCS)
 
 ### 5.1 Lumped-Capacitance Thermodynamic Network
-Spacecraft components exhibit distinct thermal time constants, conductive paths, and internal heat dissipations. PCSS II CubeSat Simulator resolves internal temperatures via a **multi-node lumped capacitance network** comprising eight critical nodes:
+Spacecraft components exhibit distinct thermal time constants, conductive paths, and internal heat dissipations. Astroneer CubeSat Simulator resolves internal temperatures via a **multi-node lumped capacitance network** comprising eight critical nodes:
 1. `BATTERY`: Electrochemical energy storage pack ($m c_p = 180\,\text{J/K}$, safe range $0^\circ\text{C}$ to $45^\circ\text{C}$).
 2. `OBC_CORE`: On-Board Computer & Edge-AI accelerator ($m c_p = 65\,\text{J/K}$, max $75^\circ\text{C}$).
 3. `PAYLOAD_GNSS`: High-gain GNSS-RO RF front-end receiver ($m c_p = 90\,\text{J/K}$).
@@ -299,7 +310,7 @@ Assuming Gaussian positional error distributions and linear relative motion duri
 $$P_c = \frac{1}{2\pi \sigma_x \sigma_y \sqrt{1 - \rho^2}} \iint_{x^2 + y^2 \le R_{\text{HBR}}^2} \exp\left( -\frac{1}{2(1-\rho^2)} \left[ \frac{(x - x_e)^2}{\sigma_x^2} - \frac{2\rho(x-x_e)(y-y_e)}{\sigma_x \sigma_y} + \frac{(y-y_e)^2}{\sigma_y^2} \right] \right) dx\, dy$$
 where $(x_e, y_e)$ is the projected miss distance offset on the $B$-plane.
 
-PCSS II CubeSat Simulator evaluates $P_c$ using the analytical **Foster-Chan series expansion** and validates against the **Akella-Alfriend formulation**, providing numerical convergence across high-aspect-ratio covariance ellipses.
+Astroneer CubeSat Simulator evaluates $P_c$ using the analytical **Foster-Chan series expansion** and validates against the **Akella-Alfriend formulation**, providing numerical convergence across high-aspect-ratio covariance ellipses.
 
 ### 7.4 Autonomous Collision Avoidance Maneuvers (CAM)
 If $P_c$ exceeds the international space agency critical threshold ($P_c > 1.0 \times 10^{-4}$) with miss distance $< 500\,\text{m}$, the autonomous CAM engine:
@@ -339,7 +350,7 @@ Link margin $M$:
 $$M = \frac{E_b}{N_0} - \left(\frac{E_b}{N_0}\right)_{\text{req}}$$
 A positive margin $M \ge 3.0\,\text{dB}$ ensures bit error rate $\text{BER} < 10^{-6}$ for QPSK modulation with rate $1/2$ LDPC forward error correction.
 
-### 8.3 Relativistic Doppler Frequency Shift
+### 8.3 Kinematic Doppler Frequency Shift
 Due to satellite orbital velocities approaching $v \approx 7.6\,\text{km/s}$, the received frequency $f_{\text{rx}}$ at the ground station exhibits a time-varying Doppler shift:
 $$f_{\text{rx}}(t) = f_0 \left( 1 - \frac{\dot{\rho}(t)}{c} \right)$$
 where $\dot{\rho}(t) = \frac{\mathbf{r}_{\text{sat}} - \mathbf{r}_{\text{gs}}}{\|\mathbf{r}_{\text{sat}} - \mathbf{r}_{\text{gs}}\|} \cdot (\mathbf{v}_{\text{sat}} - \mathbf{v}_{\text{gs}})$ is the range-rate. For S-band ($2.2\,\text{GHz}$), the Doppler offset sweeps over $\pm 55\,\text{kHz}$ during a pass, tracked via on-board digital phase-locked loops (DPLL).
@@ -440,10 +451,10 @@ All physical subsystems are dynamically coupled in real time:
 
 ## Deployment
 
-This is a static Vite application and is ready to deploy to Vercel.
+This is a Vite single-page application with optional Vercel Functions for external data adapters and a mission telemetry boundary.
 
 1. Import the repository in Vercel, or run `vercel` from the project root.
 2. Vercel uses `npm ci`, then runs `npm run build` and publishes `dist` (configured in `vercel.json`).
-3. Use Node.js 20.19 or newer; the required version is declared in `.nvmrc` and `package.json`.
+3. Use Node.js 22.x; the required version is declared in `.nvmrc` and `package.json`.
 
-The simulator currently has no required production environment variables. The values in `.env.example` are legacy AI Studio placeholders and are not needed by this static deployment.
+The simulator requires no production environment variables for its deterministic mode or public context feeds. Optional Space-Track, Earthdata, and mission-gateway credentials belong only in Vercel Project Settings; see [the implementation status](docs/REAL_TIME_DATA_STATUS.md) and [mission gateway contract](docs/MISSION_GATEWAY_CONTRACT.md).

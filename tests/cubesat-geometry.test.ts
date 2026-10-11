@@ -3,24 +3,24 @@ import { test } from 'node:test';
 import { CUBESAT_PRESETS } from '../src/core/data/tleCatalog';
 import { SolarPhysics } from '../src/core/math/solar';
 
-const pcss = CUBESAT_PRESETS.find((preset) => preset.id === 'pcss-ii')!;
+const astroneer = CUBESAT_PRESETS.find((preset) => preset.id === 'astroneer')!;
 const bioSentinel = CUBESAT_PRESETS.find((preset) => preset.id === 'biosentinel')!;
 
-test('PCSS II retains a physically consistent 1U baseline', () => {
-  assert.equal(pcss.formFactor, '1U');
-  assert.deepEqual(pcss.geometry.bodyDimensionsM, { x: 0.1, y: 0.1135, z: 0.1 });
-  assert.equal(pcss.geometry.nominalDragAreaM2, 0.01135);
-  assert.equal(pcss.massKg, 1.25);
-  assert.equal(pcss.solarCapacityW, 5);
+test('Astroneer retains a physically consistent 1U baseline', () => {
+  assert.equal(astroneer.formFactor, '1U');
+  assert.deepEqual(astroneer.geometry.bodyDimensionsM, { x: 0.1, y: 0.1135, z: 0.1 });
+  assert.equal(astroneer.geometry.nominalDragAreaM2, 0.01135);
+  assert.equal(astroneer.massKg, 1.25);
+  assert.equal(astroneer.solarCapacityW, 5);
 });
 
 test('larger CubeSat presets have materially larger geometry and solar envelopes', () => {
-  assert.ok(bioSentinel.geometry.bodyDimensionsM.x > pcss.geometry.bodyDimensionsM.x);
-  assert.ok(bioSentinel.geometry.bodyDimensionsM.y > pcss.geometry.bodyDimensionsM.y);
-  assert.ok(bioSentinel.geometry.broadsideDragAreaM2 > pcss.geometry.broadsideDragAreaM2);
+  assert.ok(bioSentinel.geometry.bodyDimensionsM.x > astroneer.geometry.bodyDimensionsM.x);
+  assert.ok(bioSentinel.geometry.bodyDimensionsM.y > astroneer.geometry.bodyDimensionsM.y);
+  assert.ok(bioSentinel.geometry.broadsideDragAreaM2 > astroneer.geometry.broadsideDragAreaM2);
   assert.ok(
     bioSentinel.geometry.solarWing.spanM * bioSentinel.geometry.solarWing.chordM
-      > pcss.geometry.solarWing.spanM * pcss.geometry.solarWing.chordM
+      > astroneer.geometry.solarWing.spanM * astroneer.geometry.solarWing.chordM
   );
 });
 
@@ -31,8 +31,8 @@ test('solar-face areas are derived from the selected bus dimensions', () => {
     true,
     1,
     25,
-    pcss.solarCapacityW,
-    pcss.geometry
+    astroneer.solarCapacityW,
+    astroneer.geometry
   );
 
   assert.ok(Math.abs((result.panelFaces.find((face) => face.faceId === '+X')?.areaM2 ?? 0) - 0.01135) < 1e-12);

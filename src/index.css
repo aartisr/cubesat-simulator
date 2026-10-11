@@ -5,7 +5,7 @@
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /*
-   * PCSS II CubeSat Simulator's single source of visual truth. Existing Tailwind utility classes
+   * Astroneer CubeSat Simulator's single source of visual truth. Existing Tailwind utility classes
    * resolve through these tokens, so every module shares the same accessible
    * dark palette without maintaining a parallel set of per-page colors.
    */

@@ -394,7 +394,7 @@ export const GroundTrackView: React.FC = () => {
     // Satellite Label
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 11px monospace';
-    ctx.fillText('PCSS-II', satX + 12, satY - 6);
+    ctx.fillText('Astroneer', satX + 12, satY - 6);
 
     ctx.fillStyle = '#38bdf8';
     ctx.font = '9px monospace';

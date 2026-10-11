@@ -2,8 +2,8 @@ import { useSyncExternalStore } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { DataSourceSettings, FeedEnvelope, ReplayBundle } from '../types/dataSources';
 
-const SETTINGS_KEY = 'pcss-ii:data-source-settings';
-const REPLAY_KEY = 'pcss-ii:replay-bundle';
+const SETTINGS_KEY = 'astroneer:data-source-settings';
+const REPLAY_KEY = 'astroneer:replay-bundle';
 const defaultSettings: DataSourceSettings = {
   spaceWeather: 'SIMULATED',
   orbitContext: 'SIMULATED',

@@ -4,7 +4,7 @@ export default function handler(request, response) {
   if (!isGet(request, response)) return;
   const sourceUrl = 'Mission gateway configuration';
   if (!process.env.MISSION_TELEMETRY_API_URL || !process.env.MISSION_TELEMETRY_BEARER_TOKEN) {
-    sendJson(response, 200, unavailable('mission-gateway', 'connection-status', 'No project-controlled telemetry gateway is configured. PCSS II remains in simulated mode.', sourceUrl), 'private, no-store');
+    sendJson(response, 200, unavailable('mission-gateway', 'connection-status', 'No project-controlled telemetry gateway is configured. Astroneer remains in simulated mode.', sourceUrl), 'private, no-store');
     return;
   }
   sendJson(response, 200, {

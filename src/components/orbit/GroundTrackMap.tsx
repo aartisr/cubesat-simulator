@@ -219,7 +219,7 @@ export const GroundTrackMap: React.FC = () => {
     // Label
     ctx.fillStyle = '#22d3ee';
     ctx.font = 'bold 10px monospace';
-    ctx.fillText('PCSS-II', satX + 11, satY - 4);
+    ctx.fillText('Astroneer', satX + 11, satY - 4);
   }, [orbit, debrisList, groundStations, activeGroundStation]);
 
   return (

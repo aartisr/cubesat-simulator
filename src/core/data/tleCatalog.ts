@@ -47,11 +47,11 @@ const GEOMETRY_6U: CubeSatGeometry = {
 
 export const CUBESAT_PRESETS: SatellitePreset[] = [
   {
-    id: 'pcss-ii',
-    name: 'PCSS-II (Virtual Twin)',
+    id: 'astroneer',
+    name: 'Astroneer (Virtual Twin)',
     formFactor: '1U',
     noradId: 58920,
-    missionDescription: 'PCSS II 1U technology demonstrator with a compact Earth-observation payload, attitude control, and autonomous conjunction-analysis simulation.',
+    missionDescription: 'Astroneer 1U technology demonstrator with a compact Earth-observation payload, attitude control, and autonomous conjunction-analysis simulation.',
     massKg: 1.25,
     batteryCapacityWh: 10.0,
     solarCapacityW: 5.0,
