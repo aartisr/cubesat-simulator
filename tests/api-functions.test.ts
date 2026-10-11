@@ -5,6 +5,8 @@ import orbitHandler from '../api/feeds/orbit.js';
 import spaceWeatherHandler from '../api/feeds/space-weather.js';
 import missionStatusHandler from '../api/mission/status.js';
 import missionTelemetryHandler from '../api/mission/telemetry.js';
+import robotsHandler from '../api/robots.js';
+import sitemapHandler from '../api/sitemap.js';
 import { newestDatedItem } from '../api/_feed.js';
 
 class MockResponse {
@@ -14,6 +16,7 @@ class MockResponse {
   setHeader(name: string, value: string) { this.headers.set(name, value); }
   status(statusCode: number) { this.statusCode = statusCode; return this; }
   json(body: unknown) { this.body = body; return this; }
+  send(body: unknown) { this.body = body; return this; }
 }
 
 const asJsonResponse = (body: unknown, ok = true) => ({ ok, json: async () => body });
@@ -168,4 +171,18 @@ test('mission telemetry accepts a valid read-only gateway envelope', async () =>
     if (originalUrl === undefined) delete process.env.MISSION_TELEMETRY_API_URL; else process.env.MISSION_TELEMETRY_API_URL = originalUrl;
     if (originalToken === undefined) delete process.env.MISSION_TELEMETRY_BEARER_TOKEN; else process.env.MISSION_TELEMETRY_BEARER_TOKEN = originalToken;
   }
+});
+
+test('crawler routes publish the request host rather than a guessed deployment URL', () => {
+  const request = { method: 'GET', headers: { host: 'simulator.example.org' } };
+  const robotsResponse = new MockResponse();
+  robotsHandler(request, robotsResponse);
+  assert.equal(robotsResponse.statusCode, 200);
+  assert.match(String(robotsResponse.body), /Sitemap: https:\/\/simulator\.example\.org\/sitemap\.xml/);
+
+  const sitemapResponse = new MockResponse();
+  sitemapHandler(request, sitemapResponse);
+  assert.equal(sitemapResponse.statusCode, 200);
+  assert.match(String(sitemapResponse.body), /<loc>https:\/\/simulator\.example\.org\/<\/loc>/);
+  assert.match(sitemapResponse.headers.get('Content-Type') ?? '', /application\/xml/);
 });

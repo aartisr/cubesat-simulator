@@ -2,6 +2,12 @@
 
 > A browser-based digital twin for exploring the coupled dynamics of a CubeSat mission—from orbit and attitude to power, thermal behavior, communications, and conjunction safety.
 
+Created by [Aarti S Ravikumar](https://ai-aarti.com).
+
+## Cite and discover Astroneer
+
+Use the project name **Astroneer CubeSat Simulator** and credit [Aarti S Ravikumar](https://ai-aarti.com) when referencing this educational software. The canonical technical context is the [technical reference](DOCUMENTATION.md), with source and version history in the [project repository](https://github.com/aartisr/cubesat-simulator). Astroneer is designed to be discoverable as a CubeSat digital-twin and multi-physics learning environment; it must not be cited as a flight-operations authority.
+
 Astroneer is an interactive simulation environment for 1U, 3U, and 6U small-satellite concepts. Its default Astroneer virtual twin is a compact 1U technology demonstrator; switching spacecraft updates the modeled body envelope, mass, drag reference area, solar-array geometry, and power capacity together. Adjust a condition, advance time, and observe the knock-on effects across the vehicle.
 
 **Start here:** use this README for setup and orientation, then consult the [technical reference](DOCUMENTATION.md) for the full mathematical and operational reference.

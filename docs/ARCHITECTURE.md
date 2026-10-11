@@ -16,6 +16,12 @@ Astroneer is organized so a new capability can be added at a clear boundary with
 | Shared contracts | `src/types/` | Domain and data-source types shared across UI/service/model code. |
 | Vercel functions | `api/` | Server-only external access, parameter validation, secret use, payload normalization, caching, and graceful failures. |
 
+### Workspace plug-in seam
+
+`src/modules/workspaces.tsx` is the single workspace registry. It owns the workspace identifier, navigation metadata, primary/overflow placement, icon, lazy renderer, and loading boundary. To add a workspace, create its module and add one `WorkspaceDefinition` there; the app shell and navigation pick it up automatically. A workspace may accept the typed `onNavigate` callback only when it needs to link to another workspace.
+
+`src/core/react/usePhysicsClock.ts` owns request-animation-frame scheduling and delta-time bounds. Simulation integration stays in the store; UI composition must not create a competing clock.
+
 ## Reusable primitives
 
 - `components/charts/ChartNavigator.tsx` provides the lossless Recharts navigation control and its user hint. New Recharts time/profile charts should use it instead of adding a new `Brush` configuration.

@@ -1,6 +1,10 @@
 {
   "name": "Astroneer CubeSat Simulator",
-  "description": "High-fidelity 3U/6U CubeSat virtual twin with SGP4 orbital mechanics, 3-axis ADCS quaternion kinematics, EPS power budget, predictive debris collision modeling, and real-time telemetry.",
+  "description": "Interactive educational digital twin for coupled 1U, 3U, and 6U CubeSat orbit, attitude, power, thermal, communications, GNSS-RO, and conjunction-analysis concepts.",
+  "author": {
+    "name": "Aarti S Ravikumar",
+    "url": "https://ai-aarti.com"
+  },
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

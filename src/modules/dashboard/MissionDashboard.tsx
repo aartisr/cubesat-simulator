@@ -23,10 +23,10 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
-import type { ActiveModuleView } from '../../components/layout/ViewNavigation';
+import type { WorkspaceId } from '../workspaces';
 
 interface MissionDashboardProps {
-  onNavigate: (view: ActiveModuleView) => void;
+  onNavigate: (view: WorkspaceId) => void;
 }
 
 export const MissionDashboard: React.FC<MissionDashboardProps> = ({ onNavigate }) => {

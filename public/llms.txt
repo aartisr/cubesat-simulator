@@ -1,0 +1,21 @@
+# Astroneer CubeSat Simulator
+
+> An interactive educational digital twin for coupled 1U, 3U, and 6U CubeSat mission concepts.
+
+Astroneer models orbit, attitude determination and control (ADCS), electrical power, thermal behavior, ground communications, GNSS radio occultation, atmospheric drag context, and conjunction-assessment concepts in a browser-based simulator.
+
+## Authorship and citation
+
+- Creator: [Aarti S Ravikumar](https://ai-aarti.com)
+- Source repository: https://github.com/aartisr/cubesat-simulator
+- Product: Astroneer CubeSat Simulator
+
+## Important scope
+
+Astroneer is an educational and engineering-exploration simulator. It is not flight-qualified ephemeris, operational collision screening, command authority, or live spacecraft telemetry.
+
+## Primary references
+
+- [Technical reference](https://github.com/aartisr/cubesat-simulator/blob/main/DOCUMENTATION.md)
+- [Architecture and extension guide](https://github.com/aartisr/cubesat-simulator/blob/main/docs/ARCHITECTURE.md)
+- [Real-time data strategy](https://github.com/aartisr/cubesat-simulator/blob/main/docs/REAL_TIME_DATA_STRATEGY.md)

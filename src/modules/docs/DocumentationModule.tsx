@@ -187,9 +187,9 @@ export const DocumentationModule: React.FC = () => {
   // BibTeX Citation Copy handler
   const handleCopyBibtex = () => {
     const bibtex = `@techreport{astroneer_cubesat_simulator_reference_2026,
-  author      = {Astroneer CubeSat Simulator Virtual Twin Team},
+  author      = {Aarti S Ravikumar},
   title       = {1U, 3U, and 6U CubeSat Virtual-Twin and Multi-Physics Simulation System},
-  institution = {Astroneer Aerospace & Orbital Dynamics Directorate},
+  institution = {Aarti S Ravikumar — https://ai-aarti.com},
   number      = {ASTRONEER-REFERENCE-2026-REV-5.0},
   year        = {2026},
   month       = {October},

@@ -1,32 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  LayoutDashboard,
-  Orbit,
-  RotateCw,
-  Zap,
-  Radio,
-  ShieldAlert,
-  Activity,
-  Globe,
-  Thermometer,
-  BookOpen,
-  Settings2,
-  ChevronDown,
-} from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useSimulatorStore } from '../../core/store/useSimulatorStore';
+import { WORKSPACES, type WorkspaceId } from '../../modules/workspaces';
 
-export type ActiveModuleView =
-  | 'OVERVIEW'
-  | 'ORBIT'
-  | 'ADCS'
-  | 'EPS'
-  | 'THERMAL'
-  | 'GNSS_RO'
-  | 'COMMS'
-  | 'DEBRIS'
-  | 'TELEMETRY'
-  | 'DATA_SOURCES'
-  | 'DOCS';
+export type ActiveModuleView = WorkspaceId;
 
 interface ViewNavigationProps {
   activeView: ActiveModuleView;
@@ -49,46 +26,23 @@ export const ViewNavigation: React.FC<ViewNavigationProps> = ({
 
   const isThrusterActive = propulsion.status === 'FIRING' || propulsion.status === 'PREHEATING';
 
-  const tabs: {
-    id: ActiveModuleView;
-    label: string;
-    shortLabel: string;
-    description: string;
-    icon: React.ComponentType<{ className?: string }>;
-    alert?: boolean;
-    badge?: string;
-  }[] = [
-    { id: 'OVERVIEW', label: 'Mission Overview', shortLabel: 'Overview', description: 'Mission at a glance', icon: LayoutDashboard },
-    { id: 'ORBIT', label: 'Orbital Mechanics', shortLabel: 'Orbit', description: 'Trajectory and ground track', icon: Orbit },
-    {
-      id: 'ADCS',
-      label: 'ADCS & Thrusters',
-      shortLabel: 'Attitude',
-      description: 'Pointing and maneuvers',
-      icon: RotateCw,
-      badge: isThrusterActive ? propulsion.status : propulsion.status === 'ARMED' ? 'ARMED' : undefined,
-      alert: isThrusterActive,
-    },
-    { id: 'EPS', label: 'EPS Power', shortLabel: 'Power', description: 'Solar and battery', icon: Zap },
-    {
-      id: 'THERMAL',
-      label: 'Thermal & Dissipation',
-      shortLabel: 'Thermal',
-      description: 'Temperatures and cooling',
-      icon: Thermometer,
-      badge: `${thermal.internalMeanTempC.toFixed(1)}°C`,
-      alert: thermal.hasThermalWarning,
-    },
-    { id: 'GNSS_RO', label: 'GNSS-RO Climate', shortLabel: 'Climate', description: 'Atmospheric soundings', icon: Globe, badge: `${gnssRO?.completedSoundings.length ?? 6}` },
-    { id: 'COMMS', label: 'RF Comms & GSN', shortLabel: 'Comms', description: 'Ground-station link', icon: Radio },
-    { id: 'DEBRIS', label: 'Debris & CAM', shortLabel: 'Safety', description: 'Conjunction assessment', icon: ShieldAlert, alert: hasWarning },
-    { id: 'TELEMETRY', label: 'Telemetry Stream', shortLabel: 'Telemetry', description: 'Raw mission stream', icon: Activity },
-    { id: 'DATA_SOURCES', label: 'Data Sources', shortLabel: 'Sources', description: 'Live context, replay, and connections', icon: Settings2 },
-    { id: 'DOCS', label: 'Flight Spec & Monograph', shortLabel: 'Guide', description: 'Concepts and flight spec', icon: BookOpen },
-  ];
-  const primaryIds: ActiveModuleView[] = ['OVERVIEW', 'ORBIT', 'ADCS', 'EPS', 'THERMAL', 'DEBRIS'];
-  const primaryTabs = tabs.filter((tab) => primaryIds.includes(tab.id));
-  const moreTabs = tabs.filter((tab) => !primaryIds.includes(tab.id));
+  const tabs = WORKSPACES.map((workspace) => ({
+    ...workspace,
+    badge: workspace.id === 'ADCS'
+      ? (isThrusterActive ? propulsion.status : propulsion.status === 'ARMED' ? 'ARMED' : undefined)
+      : workspace.id === 'THERMAL'
+        ? `${thermal.internalMeanTempC.toFixed(1)}°C`
+        : workspace.id === 'GNSS_RO'
+          ? `${gnssRO?.completedSoundings.length ?? 6}`
+          : undefined,
+    alert: workspace.id === 'ADCS'
+      ? isThrusterActive
+      : workspace.id === 'THERMAL'
+        ? thermal.hasThermalWarning
+        : workspace.id === 'DEBRIS' && hasWarning,
+  }));
+  const primaryTabs = tabs.filter((tab) => tab.primary);
+  const moreTabs = tabs.filter((tab) => !tab.primary);
   const activeMoreTab = moreTabs.find((tab) => tab.id === activeView);
 
   useEffect(() => {

@@ -4,6 +4,8 @@
 
 > **Looking for setup, a product overview, or a guided first run?** Start with the [Astroneer CubeSat Simulator README](README.md), then return here for the detailed technical reference. For the planned integration of public, authenticated, and mission-owned feeds, see the [real-time data strategy](docs/REAL_TIME_DATA_STRATEGY.md) and its [implementation status](docs/REAL_TIME_DATA_STATUS.md).
 
+**Author:** [Aarti S Ravikumar](https://ai-aarti.com)
+
 ---
 
 ## EXECUTIVE SUMMARY & MISSION ARCHITECTURE
