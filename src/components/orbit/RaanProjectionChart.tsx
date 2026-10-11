@@ -10,6 +10,8 @@ import {
   Legend,
   ReferenceLine,
 } from 'recharts';
+import { ChartInteractionHint, ChartNavigator } from '../charts/ChartNavigator';
+import { ChartViewport } from '../charts/ChartViewport';
 import { useSimulatorStore } from '../../core/store/useSimulatorStore';
 import { TrendingUp, Clock, Compass, Layers, Sparkles } from 'lucide-react';
 
@@ -198,7 +200,8 @@ export const RaanProjectionChart: React.FC = () => {
       </div>
 
       {/* Recharts Canvas */}
-      <div className="h-72 w-full pt-2">
+      <ChartViewport title="24-hour projected RAAN precession" className="h-72 w-full pt-2">
+        <ChartInteractionHint />
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={projectionData} margin={{ top: 10, right: 25, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
@@ -308,9 +311,10 @@ export const RaanProjectionChart: React.FC = () => {
                 dot={false}
               />
             )}
+            <ChartNavigator dataKey="label" />
           </LineChart>
         </ResponsiveContainer>
-      </div>
+      </ChartViewport>
 
       {/* Physics Footer Callout */}
       <div className="text-[11px] font-mono text-slate-400 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">

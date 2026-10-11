@@ -29,7 +29,7 @@ import { QuaternionMath } from '../math/quaternion';
 import { SolarPhysics, EARTH_RADIUS_KM } from '../math/solar';
 import { CollisionPhysics } from '../math/collision';
 import { GNSSROPhysics } from '../math/gnssRO';
-import { PropulsionPhysics, CUBESAT_DRY_MASS_KG } from '../math/propulsion';
+import { PropulsionPhysics } from '../math/propulsion';
 import { HarrisPriesterPhysics } from '../math/harrisPriester';
 import { ThermalPhysics } from '../math/thermal';
 
@@ -180,7 +180,8 @@ const createInitialState = (preset: SatellitePreset, startEpoch = Date.now(), en
     true,
     eclipse.fraction,
     24.5,
-    preset.solarCapacityW
+    preset.solarCapacityW,
+    preset.geometry
   );
 
   const initialEPS: EPSState = {
@@ -260,7 +261,7 @@ const createInitialState = (preset: SatellitePreset, startEpoch = Date.now(), en
 
   const defaultDragParams: DragParameters = {
     cd: 2.2,
-    crossSectionAreaM2: 0.03,
+    crossSectionAreaM2: preset.geometry.nominalDragAreaM2,
     satelliteMassKg: preset.massKg,
     f107SolarFlux: 145,
     hpExponentN: 4,
@@ -411,11 +412,12 @@ export const useSimulatorStore = create<SimulatorStore>((set, get) => {
 
     setDragAttitudePreset: (preset: DragAttitudePreset) => {
       set((state) => {
+        const geometry = state.selectedSatellite.geometry;
         let area = state.dragParameters.crossSectionAreaM2;
-        if (preset === 'FEATHERED') area = 0.01;
-        else if (preset === 'NOMINAL') area = 0.03;
-        else if (preset === 'BROADSIDE') area = 0.05;
-        else if (preset === 'DEORBIT_SAIL') area = 0.12;
+        if (preset === 'FEATHERED') area = Math.max(0.001, geometry.nominalDragAreaM2 * 0.55);
+        else if (preset === 'NOMINAL') area = geometry.nominalDragAreaM2;
+        else if (preset === 'BROADSIDE') area = geometry.broadsideDragAreaM2;
+        else if (preset === 'DEORBIT_SAIL') area = Math.max(geometry.broadsideDragAreaM2 * 2.5, 0.05);
 
         const updatedParams = {
           ...state.dragParameters,
@@ -835,7 +837,7 @@ export const useSimulatorStore = create<SimulatorStore>((set, get) => {
           config.thrustMilliNewtons,
           config.specificImpulseSec,
           state.propulsion.propellantMassGrams,
-          CUBESAT_DRY_MASS_KG,
+          state.selectedSatellite.massKg,
           config.valveHeatingEnabled
         );
 
@@ -1197,7 +1199,7 @@ export const useSimulatorStore = create<SimulatorStore>((set, get) => {
           }
         } else if (currentStatus === 'FIRING' && activeBurn) {
           chamberTemp = Math.min(285.0, chamberTemp + 15.0 * dtSimSec);
-          const satMassKg = CUBESAT_DRY_MASS_KG + propMass / 1000;
+          const satMassKg = selectedSatellite.massKg + propMass / 1000;
           const thrustN = updatedPropulsion.config.thrustMilliNewtons / 1000;
           const ispSec = updatedPropulsion.config.specificImpulseSec;
           const mDotGramsPerSec = (thrustN / (ispSec * 9.80665)) * 1000;
@@ -1305,7 +1307,8 @@ export const useSimulatorStore = create<SimulatorStore>((set, get) => {
         comms,
         updatedPropulsion,
         gnssRO,
-        dtSimSec
+        dtSimSec,
+        selectedSatellite.geometry
       );
 
       // 5. Electrical Power System (EPS) Simulation with Solar Incidence Calculator
@@ -1317,7 +1320,8 @@ export const useSimulatorStore = create<SimulatorStore>((set, get) => {
         eps.solarPanelDeployed,
         eclipse.fraction,
         newPanelTemp,
-        selectedSatellite.solarCapacityW
+        selectedSatellite.solarCapacityW,
+        selectedSatellite.geometry
       );
 
       const solarPowerGen = solarIncidence.totalArrayPowerW;

@@ -2,12 +2,66 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useSimulatorStore } from '../../core/store/useSimulatorStore';
 import { OrbitalMechanics } from '../../core/math/sgp4';
+import type { SatellitePreset } from '../../core/data/tleCatalog';
 import { Maximize2, Minimize2, Compass, Eye, ShieldAlert, Sparkles, Navigation } from 'lucide-react';
 
 export type CameraViewMode = 'CHASE' | 'EARTH_ECI' | 'DEBRIS_TRACK' | 'NADIR_DOWN';
 
 const ORBIT_SEGMENTS = 80;
 const ORBIT_POINT_COUNT = ORBIT_SEGMENTS + 1;
+const METERS_TO_VIEW_UNITS = 2.5;
+
+/** Builds a dimensionally faithful CubeSat silhouette from the selected bus envelope. */
+const createSatelliteVisual = (preset: SatellitePreset) => {
+  const group = new THREE.Group();
+  group.userData.presetId = preset.id;
+  const { x, y, z } = preset.geometry.bodyDimensionsM;
+  const bodyX = x * METERS_TO_VIEW_UNITS;
+  const bodyY = y * METERS_TO_VIEW_UNITS;
+  const bodyZ = z * METERS_TO_VIEW_UNITS;
+  const wingSpan = preset.geometry.solarWing.spanM * METERS_TO_VIEW_UNITS;
+  const wingChord = preset.geometry.solarWing.chordM * METERS_TO_VIEW_UNITS;
+
+  const chassisMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.25 });
+  group.add(new THREE.Mesh(new THREE.BoxGeometry(bodyX, bodyY, bodyZ), chassisMat));
+
+  const railMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.95, roughness: 0.18 });
+  const railRadius = Math.max(0.012, Math.min(bodyX, bodyZ) * 0.08);
+  for (const railX of [-bodyX / 2, bodyX / 2]) {
+    for (const railZ of [-bodyZ / 2, bodyZ / 2]) {
+      const rail = new THREE.Mesh(new THREE.CylinderGeometry(railRadius, railRadius, bodyY, 8), railMat);
+      rail.position.set(railX, 0, railZ);
+      group.add(rail);
+    }
+  }
+
+  const panelMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.2, metalness: 0.5 });
+  const panelThickness = 0.014;
+  for (const side of [-1, 1]) {
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(wingSpan, wingChord, panelThickness), panelMat);
+    panel.position.set(side * (bodyX / 2 + wingSpan / 2), 0, 0);
+    group.add(panel);
+  }
+
+  const lens = new THREE.Mesh(
+    new THREE.CylinderGeometry(Math.max(0.035, bodyX * 0.22), Math.max(0.035, bodyX * 0.22), 0.06, 16),
+    new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.9, roughness: 0.1 })
+  );
+  lens.position.set(0, -bodyY / 2 - 0.025, 0);
+  group.add(lens);
+  group.add(new THREE.AxesHelper(Math.max(0.35, Math.max(bodyX, bodyY, bodyZ) * 0.75)));
+  return group;
+};
+
+/** Releases meshes when the active spacecraft is replaced. */
+const disposeObject3D = (object: THREE.Object3D) => {
+  object.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    child.geometry.dispose();
+    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    materials.forEach((material) => material.dispose());
+  });
+};
 
 export const OrbitView3D: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,6 +85,7 @@ export const OrbitView3D: React.FC = () => {
   const adcs = useSimulatorStore((s) => s.adcs);
   const debrisList = useSimulatorStore((s) => s.debrisList);
   const conjunctions = useSimulatorStore((s) => s.conjunctions);
+  const selectedSatellite = useSimulatorStore((s) => s.selectedSatellite);
 
   // Scale factors: Earth radius = 10 units (Real Earth = 6378 km, so scale = 10 / 6378 ≈ 0.001568)
   const SCALE = 10 / 6378.137;
@@ -158,44 +213,8 @@ export const OrbitView3D: React.FC = () => {
     const atmosphereMesh = new THREE.Mesh(atmosGeo, atmosMat);
     scene.add(atmosphereMesh);
 
-    // 7. Satellite 3D Representation (Detailed 3U CubeSat with solar wings)
-    const satGroup = new THREE.Group();
-
-    // Chassis 3U aluminum body (approx 10cm x 10cm x 30cm scaled)
-    const chassisGeo = new THREE.BoxGeometry(0.25, 0.75, 0.25);
-    const chassisMat = new THREE.MeshStandardMaterial({
-      color: 0xe2e8f0,
-      metalness: 0.85,
-      roughness: 0.25,
-    });
-    const chassis = new THREE.Mesh(chassisGeo, chassisMat);
-    satGroup.add(chassis);
-
-    // Solar array panels (deployable left and right)
-    const panelGeo = new THREE.BoxGeometry(0.7, 0.65, 0.02);
-    const panelMat = new THREE.MeshStandardMaterial({
-      color: 0x1d4ed8, // Deep cobalt blue solar cells
-      roughness: 0.2,
-      metalness: 0.5,
-    });
-    const leftPanel = new THREE.Mesh(panelGeo, panelMat);
-    leftPanel.position.set(-0.52, 0, 0);
-    satGroup.add(leftPanel);
-
-    const rightPanel = new THREE.Mesh(panelGeo, panelMat);
-    rightPanel.position.set(0.52, 0, 0);
-    satGroup.add(rightPanel);
-
-    // Antenna & Optics sensor lens (gold payload aperture)
-    const lensGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.08, 16);
-    const lensMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.9, roughness: 0.1 });
-    const lens = new THREE.Mesh(lensGeo, lensMat);
-    lens.position.set(0, -0.4, 0);
-    satGroup.add(lens);
-
-    // Body coordinate frame triad axes (X: Red, Y: Green, Z: Blue)
-    const axesHelper = new THREE.AxesHelper(0.6);
-    satGroup.add(axesHelper);
+    // 7. Satellite visual, scaled from the selected stowed bus and deployed-array envelope.
+    const satGroup = createSatelliteVisual(selectedSatellite);
 
     scene.add(satGroup);
     satMeshRef.current = satGroup;
@@ -330,9 +349,22 @@ export const OrbitView3D: React.FC = () => {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
       container.removeEventListener('wheel', onWheel);
+      disposeObject3D(satGroup);
       renderer.dispose();
     };
   }, []);
+
+  useEffect(() => {
+    if (!sceneRef.current || satMeshRef.current?.userData.presetId === selectedSatellite.id) return;
+    const previous = satMeshRef.current;
+    if (previous) {
+      sceneRef.current.remove(previous);
+      disposeObject3D(previous);
+    }
+    const replacement = createSatelliteVisual(selectedSatellite);
+    sceneRef.current.add(replacement);
+    satMeshRef.current = replacement;
+  }, [selectedSatellite]);
 
   // Update Three.js entities whenever Zustand state advances
   useEffect(() => {

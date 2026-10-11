@@ -2,13 +2,13 @@
 ## High-Fidelity 3U/6U CubeSat Virtual Twin & Multi-Physics Orbital Mechanics Simulation System
 ### Document Identifier: PCSS-II-SPEC-2026-REV-4.2 | Classification: Open Aerospace Standard (AIAA/CCSDS)
 
-> **Looking for setup, a product overview, or a guided first run?** Start with the [PCSS II CubeSat Simulator README](README.md), then return here for the detailed technical reference.
+> **Looking for setup, a product overview, or a guided first run?** Start with the [PCSS II CubeSat Simulator README](README.md), then return here for the detailed technical reference. For the planned integration of public, authenticated, and mission-owned feeds, see the [real-time data strategy](docs/REAL_TIME_DATA_STRATEGY.md) and its [implementation status](docs/REAL_TIME_DATA_STATUS.md).
 
 ---
 
 ## EXECUTIVE SUMMARY & MISSION ARCHITECTURE
 
-**PCSS II CubeSat Simulator** represents a state-of-the-art virtual twin and digital engineering platform for low-Earth orbit (LEO) small satellites (specifically 3U and 6U nanosatellite architectures conforming to the CubeSat Design Specification rev. 14). The platform executes high-precision, coupled multi-physics simulations in real-time (20 Hz decoupled clock with variable time-warp up to 300×), modeling:
+**PCSS II CubeSat Simulator** represents a virtual-twin and digital-engineering platform for low-Earth-orbit (LEO) small satellites. It includes a 1U PCSS II baseline and representative 3U and 6U concepts. Their body envelopes, mass, reference area, and deployed-array geometry are selected together rather than treated as interchangeable. The platform executes coupled multi-physics simulations in real-time (20 Hz decoupled clock with variable time-warp up to 300×), modeling:
 
 1. **Relativistic and Perturbed Astrodynamics** (WGS-84 geodetic frame, ECI J2000 coordinates, non-spherical Earth gravity potential with $J_2$ secular nodal and apsidal precession, and high-precision Keplerian propagation).
 2. **Thermospheric Fluid Aerodynamics** (Modified Harris-Priester dynamic atmospheric density model with solar $F_{10.7}$ radio flux scaling, diurnal bulge lag, attitude-dependent aerodynamic cross-sections, ballistic coefficient tracking, and orbital lifetime decay estimation).

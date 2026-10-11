@@ -33,14 +33,14 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({ onOpenDocs }) => {
 
   return (
     <header className="w-full bg-slate-950/90 border-b border-slate-800/80 backdrop-blur-md px-4 py-3 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto flex min-w-0 flex-col md:flex-row md:items-center justify-between gap-3">
         {/* Left: Project Branding & Satellite Name */}
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0 shadow-lg shadow-cyan-950/40">
             <Satellite className="w-5 h-5" />
           </div>
 
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-2">
               <span className="font-extrabold text-sm tracking-widest text-white uppercase font-mono">
                 PCSS II
@@ -51,8 +51,8 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({ onOpenDocs }) => {
               </span>
             </div>
 
-            <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono mt-0.5">
-              <span>{selectedSatellite.name}</span>
+            <div className="flex min-w-0 items-center gap-2 text-[11px] text-slate-400 font-mono mt-0.5">
+              <span className="truncate">{selectedSatellite.name}</span>
               <span className="text-slate-400">/</span>
               <span>{selectedSatellite.formFactor} BUS</span>
               <span className="text-slate-400">/</span>
@@ -64,11 +64,11 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({ onOpenDocs }) => {
         </div>
 
         {/* Center: Mission clock, intentionally kept readable before advanced controls */}
-        <div aria-label="Simulation clock" className="flex items-center gap-4 bg-slate-900/80 border border-slate-800 rounded-lg px-3.5 py-1.5 self-start md:self-center font-mono">
+        <div aria-label="Simulation clock" className="flex max-w-full items-center gap-2 bg-slate-900/80 border border-slate-800 rounded-lg px-3 py-1.5 self-start md:self-center font-mono sm:gap-4 sm:px-3.5">
           <div className="flex items-center gap-1.5 text-xs text-slate-200">
             <Clock className="w-3.5 h-3.5 text-cyan-400" />
             <span className="text-slate-400">SIM:</span>
-            <span className="font-semibold text-white">{utcString}</span>
+            <span className="font-semibold text-white whitespace-nowrap">{utcString}</span>
           </div>
 
           <div className="hidden sm:block text-slate-700">|</div>
@@ -79,7 +79,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({ onOpenDocs }) => {
         </div>
 
         {/* Right: Time Warp & Simulation Controls */}
-        <div className="flex items-center gap-2.5 self-start md:self-center">
+        <div className="flex max-w-full items-center gap-1.5 self-start md:self-center sm:gap-2.5">
           {/* Play / Pause */}
           <button
             onClick={togglePlay}
@@ -95,14 +95,14 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({ onOpenDocs }) => {
           </button>
 
           {/* Time Warp Multipliers */}
-          <div aria-label="Simulation speed" className="flex items-center gap-1 p-1 bg-slate-900/80 rounded-lg border border-slate-800 font-mono text-xs">
+          <div aria-label="Simulation speed" className="flex items-center gap-0.5 p-1 bg-slate-900/80 rounded-lg border border-slate-800 font-mono text-xs sm:gap-1">
             {warpOptions.map((warp) => (
               <button
                 key={warp}
                 onClick={() => setTimeWarp(warp)}
                 aria-pressed={timeWarp === warp}
                 aria-label={`Set simulation speed to ${warp} times real time`}
-                className={`px-2 py-1 rounded transition-colors font-medium ${
+                className={`px-1.5 py-1 rounded transition-colors font-medium sm:px-2 ${
                   timeWarp === warp && isPlaying
                     ? 'bg-cyan-500 text-slate-950 font-bold'
                     : 'text-slate-400 hover:text-slate-200'

@@ -20,7 +20,6 @@ import {
   Layers,
   Award,
   ChevronRight,
-  ExternalLink,
   Calculator,
   ListChecks,
   Activity,
@@ -243,16 +242,6 @@ export const DocumentationModule: React.FC = () => {
 
           {/* Quick Action Buttons */}
           <div className="flex items-center gap-2.5 shrink-0 self-start lg:self-center">
-            <a
-              href="https://github.com/aartisr/cubesat-simulator#readme"
-              target="_blank"
-              rel="noreferrer"
-              className="px-3 py-2 rounded-xl bg-slate-950/80 hover:bg-slate-800 border border-slate-800 text-xs font-mono text-slate-300 hover:text-white transition-all flex items-center gap-1.5 shadow-sm"
-              title="Open the project README"
-            >
-              <ExternalLink className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Project README</span>
-            </a>
             <button
               onClick={handleCopyBibtex}
               className="px-3 py-2 rounded-xl bg-slate-950/80 hover:bg-slate-800 border border-slate-800 text-xs font-mono text-slate-300 hover:text-white transition-all flex items-center gap-1.5 shadow-sm"

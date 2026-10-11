@@ -1,4 +1,5 @@
 import { Vector3D } from '../../types/telemetry';
+import type { CubeSatGeometry } from '../data/tleCatalog';
 
 export const EARTH_RADIUS_KM = 6378.137;
 export const SUN_RADIUS_KM = 696340;
@@ -124,7 +125,8 @@ export class SolarPhysics {
     panelsDeployed: boolean,
     eclipseFraction: number,
     panelTempC = 25.0,
-    solarCapacityW = 18.5
+    solarCapacityW = 18.5,
+    geometry?: CubeSatGeometry
   ) {
     // 1. Transform Sun Vector from ECI to Satellite Body Frame:
     // v_body = q^-1 * v_eci * q
@@ -159,7 +161,8 @@ export class SolarPhysics {
       z: res.z / sBodyMag,
     };
 
-    // 2. Define Body Faces & Solar Array Geometry
+    // 2. Define body faces from the selected spacecraft envelope. The default
+    // preserves the former 3U model for callers that do not supply a preset.
     // Triple-junction GaAs nominal efficiency with temperature derating (-0.25%/°C above 25°C)
     const baseCellEffPercent = 29.5;
     const tempDerateFactor = 1.0 - 0.0025 * (panelTempC - 25.0);
@@ -173,15 +176,22 @@ export class SolarPhysics {
       isDeployable: boolean;
     }
 
+    const body = geometry?.bodyDimensionsM ?? { x: 0.1, y: 0.3405, z: 0.1 };
+    const wing = geometry?.solarWing ?? { spanM: 0.18, chordM: 0.30 };
+    const xFaceAreaM2 = body.y * body.z;
+    const yFaceAreaM2 = body.x * body.z;
+    const zFaceAreaM2 = body.x * body.y;
+    const wingAreaM2 = wing.spanM * wing.chordM;
+
     const faceSpecs: FaceSpec[] = [
-      { faceId: '+X', name: '+X Starboard Face (3U)', normalBody: { x: 1, y: 0, z: 0 }, areaM2: 0.030, isDeployable: false },
-      { faceId: '-X', name: '-X Port Face (3U)', normalBody: { x: -1, y: 0, z: 0 }, areaM2: 0.030, isDeployable: false },
-      { faceId: '+Y', name: '+Y Zenith Face (3U)', normalBody: { x: 0, y: 1, z: 0 }, areaM2: 0.030, isDeployable: false },
-      { faceId: '-Y', name: '-Y Nadir Face (3U)', normalBody: { x: 0, y: -1, z: 0 }, areaM2: 0.030, isDeployable: false },
-      { faceId: '+Z', name: '+Z Sun Boresight Face (1U)', normalBody: { x: 0, y: 0, z: 1 }, areaM2: 0.010, isDeployable: false },
-      { faceId: '-Z', name: '-Z Payload Aft Face (1U)', normalBody: { x: 0, y: 0, z: -1 }, areaM2: 0.005, isDeployable: false },
-      { faceId: 'WING_LEFT', name: 'Port Deployable Wing (+Z Normal)', normalBody: { x: 0, y: 0, z: 1 }, areaM2: 0.055, isDeployable: true },
-      { faceId: 'WING_RIGHT', name: 'Starboard Deployable Wing (+Z Normal)', normalBody: { x: 0, y: 0, z: 1 }, areaM2: 0.055, isDeployable: true },
+      { faceId: '+X', name: '+X Starboard Face', normalBody: { x: 1, y: 0, z: 0 }, areaM2: xFaceAreaM2, isDeployable: false },
+      { faceId: '-X', name: '-X Port Face', normalBody: { x: -1, y: 0, z: 0 }, areaM2: xFaceAreaM2, isDeployable: false },
+      { faceId: '+Y', name: '+Y Zenith Face', normalBody: { x: 0, y: 1, z: 0 }, areaM2: yFaceAreaM2, isDeployable: false },
+      { faceId: '-Y', name: '-Y Nadir Face', normalBody: { x: 0, y: -1, z: 0 }, areaM2: yFaceAreaM2, isDeployable: false },
+      { faceId: '+Z', name: '+Z Sun Boresight Face', normalBody: { x: 0, y: 0, z: 1 }, areaM2: zFaceAreaM2, isDeployable: false },
+      { faceId: '-Z', name: '-Z Payload Aft Face', normalBody: { x: 0, y: 0, z: -1 }, areaM2: zFaceAreaM2, isDeployable: false },
+      { faceId: 'WING_LEFT', name: 'Port Deployable Wing (+Z Normal)', normalBody: { x: 0, y: 0, z: 1 }, areaM2: wingAreaM2, isDeployable: true },
+      { faceId: 'WING_RIGHT', name: 'Starboard Deployable Wing (+Z Normal)', normalBody: { x: 0, y: 0, z: 1 }, areaM2: wingAreaM2, isDeployable: true },
     ];
 
     let totalRawPowerW = 0;
@@ -222,7 +232,7 @@ export class SolarPhysics {
     });
 
     // Scale to match rated spacecraft capacity curve
-    const maxReferenceArea = 0.03 * 4 + 0.01 + (panelsDeployed ? 0.11 : 0);
+    const maxReferenceArea = 2 * (xFaceAreaM2 + yFaceAreaM2 + zFaceAreaM2) + (panelsDeployed ? 2 * wingAreaM2 : 0);
     const nominalMaxW = solarCapacityW * (panelsDeployed ? 1.0 : 0.35);
     const scaling = nominalMaxW / (SOLAR_CONSTANT_W_M2 * maxReferenceArea * (baseCellEffPercent / 100) * 0.96 * 0.5 || 1);
     const scaledTotalPowerW = Number((totalRawPowerW * scaling * (eclipseFraction > 0 ? 1 : 0)).toFixed(2));
@@ -239,4 +249,3 @@ export class SolarPhysics {
     };
   }
 }
-

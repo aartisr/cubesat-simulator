@@ -3,6 +3,8 @@ import { GroundPass, GroundStation } from '../types/telemetry';
 import { GLOBAL_GROUND_STATIONS } from '../core/data/groundStations';
 import { OrbitalMechanics } from '../core/math/sgp4';
 import { useSimulatorStore } from '../core/store/useSimulatorStore';
+import { fetchFeed, getReplayBundle, isSpaceWeatherPayload, useDataSourceSettings } from './dataSources';
+import type { DataProvenance, FeedQuality } from '../types/dataSources';
 
 export interface SpaceWeatherData {
   kpIndex: number;            // 0 - 9 planetary geomagnetic Kp index
@@ -11,6 +13,9 @@ export interface SpaceWeatherData {
   dragDecelerationMs2: number;    // Aerodynamic drag deceleration
   geomagneticActivity: 'QUIET' | 'UNSETTLED' | 'ACTIVE' | 'MINOR_STORM' | 'MAJOR_STORM';
   lastUpdated: string;
+  provenance: DataProvenance;
+  quality: FeedQuality;
+  sourceUrl?: string;
 }
 
 export interface MissionLogEntry {
@@ -71,6 +76,7 @@ export const usePassPredictionsQuery = () => {
  * Query for space weather indices & upper atmospheric density modeling
  */
 export const useSpaceWeatherQuery = () => {
+  const sourceSettings = useDataSourceSettings();
   const altitudeKm = useSimulatorStore((s) => s.orbit.geodetic.altitude);
   const velocityKmS = useSimulatorStore((s) =>
     Math.sqrt(
@@ -81,7 +87,7 @@ export const useSpaceWeatherQuery = () => {
   );
 
   return useQuery({
-    queryKey: ['spaceWeather', Math.round(altitudeKm)],
+    queryKey: ['spaceWeather', sourceSettings.spaceWeather, Math.round(altitudeKm)],
     queryFn: async (): Promise<SpaceWeatherData> => {
       // Exponential atmospheric density model Jacchia-Roberts / NRLMSISE-00 approximation
       // rho(h) = rho0 * exp(-(h - h0) / H)
@@ -96,14 +102,60 @@ export const useSpaceWeatherQuery = () => {
       const vMs = velocityKmS * 1000;
       const dragA = 0.5 * Cd * areaOverMass * density * vMs * vMs;
 
-      return {
+      const fallback: SpaceWeatherData = {
         kpIndex: 2.33,
         f107Flux: 142.5,
         atmosphericDensityKgM3: density,
         dragDecelerationMs2: dragA,
         geomagneticActivity: 'QUIET',
         lastUpdated: new Date().toISOString(),
+        provenance: 'SIMULATED' as const,
+        quality: 'NOMINAL' as const,
       };
+
+      if (sourceSettings.spaceWeather === 'REPLAY') {
+        const bundle = getReplayBundle();
+        const payload = bundle?.payload as Record<string, unknown> | undefined;
+        const candidate = payload && isSpaceWeatherPayload(payload.spaceWeather) ? payload.spaceWeather : payload;
+        if (!isSpaceWeatherPayload(candidate) || !bundle) {
+          return { ...fallback, provenance: 'REPLAY' as const, quality: 'UNAVAILABLE' as const };
+        }
+        const kpIndex = Number(candidate.kpIndex);
+        return {
+          ...fallback,
+          kpIndex,
+          f107Flux: Number(candidate.f107Flux),
+          geomagneticActivity: kpIndex >= 7 ? 'MAJOR_STORM' : kpIndex >= 5 ? 'MINOR_STORM' : kpIndex >= 4 ? 'ACTIVE' : kpIndex >= 3 ? 'UNSETTLED' : 'QUIET',
+          lastUpdated: bundle.observedAt,
+          provenance: 'REPLAY',
+          quality: 'NOMINAL',
+          sourceUrl: bundle.sourceUrl,
+        };
+      }
+
+      if (sourceSettings.spaceWeather !== 'LIVE_CONTEXT') return fallback;
+
+      try {
+        const feed = await fetchFeed<{ kpIndex: number; f107Flux: number }>('/api/feeds/space-weather');
+        const kpIndex = Number(feed?.payload?.kpIndex);
+        const f107Flux = Number(feed?.payload?.f107Flux);
+        if (feed?.quality !== 'NOMINAL' || !Number.isFinite(kpIndex) || !Number.isFinite(f107Flux)) {
+          return { ...fallback, quality: 'UNAVAILABLE' as const, sourceUrl: feed?.sourceUrl };
+        }
+
+        return {
+          ...fallback,
+          kpIndex,
+          f107Flux,
+          geomagneticActivity: kpIndex >= 7 ? 'MAJOR_STORM' : kpIndex >= 5 ? 'MINOR_STORM' : kpIndex >= 4 ? 'ACTIVE' : kpIndex >= 3 ? 'UNSETTLED' : 'QUIET',
+          lastUpdated: feed.observedAt ?? feed.retrievedAt,
+          provenance: 'LIVE_CONTEXT',
+          quality: feed.quality,
+          sourceUrl: feed.sourceUrl,
+        };
+      } catch {
+        return { ...fallback, quality: 'UNAVAILABLE' as const };
+      }
     },
     staleTime: 30000,
   });

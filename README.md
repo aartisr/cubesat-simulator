@@ -2,7 +2,7 @@
 
 > A browser-based digital twin for exploring the coupled dynamics of a CubeSat mission—from orbit and attitude to power, thermal behavior, communications, and conjunction safety.
 
-PCSS II is an interactive simulation environment for 3U and 6U small-satellite concepts. It turns spacecraft engineering relationships into a coherent, explorable mission experience: adjust a condition, advance time, and observe the knock-on effects across the vehicle.
+PCSS II is an interactive simulation environment for 1U, 3U, and 6U small-satellite concepts. Its default PCSS II virtual twin is a compact 1U technology demonstrator; switching spacecraft updates the modeled body envelope, mass, drag reference area, solar-array geometry, and power capacity together. Adjust a condition, advance time, and observe the knock-on effects across the vehicle.
 
 **Start here:** use this README for setup and orientation, then consult the [technical monograph](DOCUMENTATION.md) for the full mathematical and operational reference.
 
@@ -62,6 +62,10 @@ The React interface reads a shared Zustand simulation store. The physics loop ad
 | Resource | Use it for |
 | --- | --- |
 | [Technical monograph](DOCUMENTATION.md) | Equations, assumptions, operations procedures, nomenclature, and references |
+| [Real-time data strategy](docs/REAL_TIME_DATA_STRATEGY.md) | Hybrid-digital-twin architecture, source catalogue, secure feed integration, and implementation roadmap |
+| [Real-time data status](docs/REAL_TIME_DATA_STATUS.md) | Implemented stages, deployment checklist, optional environment variables, and intentional limits |
+| [Mission gateway contract](docs/MISSION_GATEWAY_CONTRACT.md) | Read-only HTTPS telemetry schema, gateway responsibilities, and credential-rotation procedure |
+| [Architecture guide](docs/ARCHITECTURE.md) | Module boundaries, reusable primitives, extension recipe, and resilience rules |
 | [In-app documentation module](src/modules/docs/DocumentationModule.tsx) | Searchable, interactive explanations, calculators, checklists, and live telemetry cross-references |
 | [Orbit mathematics](src/core/math/sgp4.ts) | Propagation and orbital-element implementation |
 | [Thermal mathematics](src/core/math/thermal.ts) | Thermal-network model and control behavior |
@@ -84,6 +88,8 @@ Useful commands:
 npm run lint    # Type-check the application
 npm run build   # Create a production build in dist/
 npm run preview # Serve the production build locally
+npm test        # Run deterministic physics, data, and API regression tests
+npm run test:all # Run type-check, tests, and production build
 ```
 
 ## Deploy to Vercel

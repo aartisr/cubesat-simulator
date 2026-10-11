@@ -11,6 +11,8 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { ChartInteractionHint, ChartNavigator } from '../../components/charts/ChartNavigator';
+import { ChartViewport } from '../../components/charts/ChartViewport';
 import {
   Globe,
   Cpu,
@@ -547,7 +549,8 @@ export const GNSSROModule: React.FC = () => {
             </div>
 
             {/* Recharts Atmospheric Plot Container */}
-            <div className="w-full h-80 bg-slate-950 p-2 sm:p-3 rounded-lg border border-slate-800">
+            <ChartViewport title="GNSS radio-occultation atmospheric profile" className="h-80 w-full rounded-lg border border-slate-800 bg-slate-950 p-2 sm:p-3">
+              <ChartInteractionHint compact />
               <ResponsiveContainer width="100%" height="100%">
                 {activeTab === 'TEMPERATURE' ? (
                   <LineChart data={profileData} margin={{ top: 10, right: 20, bottom: 20, left: 10 }}>
@@ -586,6 +589,7 @@ export const GNSSROModule: React.FC = () => {
                       dot={false}
                       name="Edge-AI INT8 Neural Reconstructed (°C)"
                     />
+                    <ChartNavigator dataKey="altitudeKm" />
                   </LineChart>
                 ) : activeTab === 'REFRACTIVITY' ? (
                   <LineChart data={profileData} margin={{ top: 10, right: 20, bottom: 20, left: 10 }}>
@@ -623,6 +627,7 @@ export const GNSSROModule: React.FC = () => {
                       dot={false}
                       name="Bending Angle (μrad)"
                     />
+                    <ChartNavigator dataKey="altitudeKm" />
                   </LineChart>
                 ) : activeTab === 'PRESSURE' ? (
                   <LineChart data={profileData} margin={{ top: 10, right: 20, bottom: 20, left: 10 }}>
@@ -652,6 +657,7 @@ export const GNSSROModule: React.FC = () => {
                       dot={false}
                       name="Barometric Pressure P(z) (hPa)"
                     />
+                    <ChartNavigator dataKey="altitudeKm" />
                   </LineChart>
                 ) : activeTab === 'HUMIDITY' ? (
                   <LineChart data={profileData.filter((d) => d.altitudeKm <= 15)} margin={{ top: 10, right: 20, bottom: 20, left: 10 }}>
@@ -681,6 +687,7 @@ export const GNSSROModule: React.FC = () => {
                       dot={false}
                       name="Specific Humidity q (0-15 km)"
                     />
+                    <ChartNavigator dataKey="altitudeKm" />
                   </LineChart>
                 ) : (
                   <LineChart data={profileData} margin={{ top: 10, right: 20, bottom: 20, left: 10 }}>
@@ -710,10 +717,11 @@ export const GNSSROModule: React.FC = () => {
                       dot={false}
                       name="Neural Quantization Error (°C)"
                     />
+                    <ChartNavigator dataKey="altitudeKm" />
                   </LineChart>
                 )}
               </ResponsiveContainer>
-            </div>
+            </ChartViewport>
 
             {/* Profile Level Inspection Table (Sample Vertical Layers) */}
             <div className="overflow-x-auto">

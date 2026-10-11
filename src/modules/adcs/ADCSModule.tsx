@@ -107,7 +107,7 @@ export const ADCSModule: React.FC = () => {
                 <span className="text-[11px] font-mono text-cyan-400">NORM: 1.0000</span>
               </div>
 
-            <div className="grid grid-cols-4 gap-2 mb-4 font-mono text-center">
+            <div className="grid grid-cols-2 gap-2 mb-4 font-mono text-center sm:grid-cols-4">
               <div className="bg-slate-950 p-2 rounded border border-slate-800">
                 <div className="text-[10px] text-slate-400">q0 (w)</div>
                 <div className="text-xs text-slate-200 font-semibold">{adcs.quaternion.w.toFixed(4)}</div>

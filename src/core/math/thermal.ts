@@ -14,6 +14,7 @@ import {
   GNSSROState,
 } from '../../types/telemetry';
 import { QuaternionMath } from './quaternion';
+import type { CubeSatGeometry } from '../data/tleCatalog';
 
 // Physical constants
 export const STEFAN_BOLTZMANN_SIGMA = 5.670374419e-8; // W/(m²·K⁴)
@@ -363,7 +364,8 @@ export class ThermalPhysics {
     comms: CommsState,
     propulsion: PropulsionState,
     gnssRO: GNSSROState,
-    dtSimSec: number
+    dtSimSec: number,
+    geometry?: CubeSatGeometry
   ): ThermalState {
     const clampedDt = Math.max(0.01, Math.min(10.0, dtSimSec));
     const nodes = { ...prevState.nodes };
@@ -390,20 +392,24 @@ export class ThermalPhysics {
     const sunDotNadir = sunVectorECI.x * nadirECI.x + sunVectorECI.y * nadirECI.y + sunVectorECI.z * nadirECI.z;
     const earthDaylightFraction = Math.max(0, sunDotNadir);
 
-    // CubeSat External Surface Areas (3U CubeSat: 0.1m x 0.1m x 0.34m)
-    const areaBodyLongM2 = 0.034; // 10cm x 34cm
-    const areaBodyEndM2 = 0.010;  // 10cm x 10cm
-    const areaSolarWingsM2 = eps.solarPanelDeployed ? 0.12 : 0.0;
-    const areaRadiatorM2 = 0.022; // Dedicated cold face radiator plate
+    // Surface areas derive from the active satellite envelope. The fallback
+    // retains the former 3U baseline for independent callers.
+    const body = geometry?.bodyDimensionsM ?? { x: 0.1, y: 0.3405, z: 0.1 };
+    const wing = geometry?.solarWing ?? { spanM: 0.18, chordM: 0.30 };
+    const areaBodyXFaceM2 = body.y * body.z;
+    const areaBodyYFaceM2 = body.x * body.z;
+    const areaBodyZFaceM2 = body.x * body.y;
+    const areaSolarWingsM2 = eps.solarPanelDeployed ? 2 * wing.spanM * wing.chordM : 0.0;
+    const areaRadiatorM2 = Math.max(0.005, areaBodyZFaceM2 * 0.65);
 
     // 2. Incident Solar Flux on External Faces
     // Transform Sun vector into Satellite Body Frame using quaternion
     const sunBody = QuaternionMath.rotateVector(QuaternionMath.conjugate(satQuaternion), sunVectorECI);
 
     // Sum of projected illuminated area * solar absorptivity (alpha ~ 0.90 for solar cells, 0.40 for aluminum)
-    const absX = Math.abs(sunBody.x) * areaBodyLongM2 * 0.90;
-    const absY = Math.abs(sunBody.y) * areaBodyEndM2 * 0.45;
-    const absZ = Math.abs(sunBody.z) * areaBodyLongM2 * 0.90;
+    const absX = Math.abs(sunBody.x) * areaBodyXFaceM2 * 0.90;
+    const absY = Math.abs(sunBody.y) * areaBodyYFaceM2 * 0.45;
+    const absZ = Math.abs(sunBody.z) * areaBodyZFaceM2 * 0.90;
     const absWings = areaSolarWingsM2 * Math.max(0, sunBody.z) * 0.92;
 
     const projectedSolarAreaM2 = (absX + absY + absZ + absWings);
@@ -540,7 +546,7 @@ export class ThermalPhysics {
     // Calculate Radiative Heat Rejection to Deep Space (3 K)
     // Q_rad = eps * sigma * A * (T^4 - T_space^4)
     const nodeRadiation: Record<ThermalNodeId, number> = {
-      SOLAR_PANELS: 0.85 * STEFAN_BOLTZMANN_SIGMA * (areaBodyLongM2 * 3 + areaSolarWingsM2) * Math.pow(nodes['SOLAR_PANELS'].temperatureK, 4),
+      SOLAR_PANELS: 0.85 * STEFAN_BOLTZMANN_SIGMA * (areaBodyXFaceM2 + areaBodyYFaceM2 + areaBodyZFaceM2 + areaSolarWingsM2) * Math.pow(nodes['SOLAR_PANELS'].temperatureK, 4),
       RADIATOR: effectiveRadiatorEmissivity * STEFAN_BOLTZMANN_SIGMA * areaRadiatorM2 * Math.pow(nodes['RADIATOR'].temperatureK, 4),
       CHASSIS: 0.05 * STEFAN_BOLTZMANN_SIGMA * 0.015 * Math.pow(nodes['CHASSIS'].temperatureK, 4), // Structural MLI leakage
       BATTERY: 0,

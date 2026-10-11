@@ -11,6 +11,8 @@ import {
   Legend,
   ReferenceLine,
 } from 'recharts';
+import { ChartInteractionHint, ChartNavigator } from '../charts/ChartNavigator';
+import { ChartViewport } from '../charts/ChartViewport';
 import { Activity, Thermometer, ShieldAlert, Clock } from 'lucide-react';
 
 export const ThermalHistoryChart: React.FC = () => {
@@ -71,7 +73,8 @@ export const ThermalHistoryChart: React.FC = () => {
       </div>
 
       {/* Recharts Container */}
-      <div className="h-64 sm:h-72 w-full bg-slate-950/60 rounded-xl p-3 border border-slate-800/60">
+      <ChartViewport title="Thermal history" className="h-64 w-full rounded-xl border border-slate-800/60 bg-slate-950/60 p-3 sm:h-72">
+        <ChartInteractionHint compact />
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 10, right: 15, left: -10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
@@ -147,9 +150,10 @@ export const ThermalHistoryChart: React.FC = () => {
               dot={false}
               isAnimationActive={false}
             />
+            <ChartNavigator dataKey="time" />
           </LineChart>
         </ResponsiveContainer>
-      </div>
+      </ChartViewport>
 
       {/* Safety Bounds Guidance */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">

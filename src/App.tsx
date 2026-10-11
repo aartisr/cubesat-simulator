@@ -13,6 +13,8 @@ import { DebrisModule } from './modules/debris/DebrisModule';
 import { ThermalModule } from './modules/thermal/ThermalModule';
 import { TelemetryStream } from './modules/telemetry/TelemetryStream';
 import { DocumentationModule } from './modules/docs/DocumentationModule';
+import { DataSourcesModule } from './modules/dataSources/DataSourcesModule';
+import { LiveContextBridge } from './components/dataSources/LiveContextBridge';
 
 // Create TanStack Query client
 const queryClient = new QueryClient({
@@ -56,6 +58,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="app-shell min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+        <LiveContextBridge />
         {/* Top Mission Control Header */}
         <HeaderBar onOpenDocs={() => setActiveView('DOCS')} />
 
@@ -63,7 +66,7 @@ export default function App() {
         <ViewNavigation activeView={activeView} onSelectView={setActiveView} />
 
         {/* Active Module Canvas Area */}
-        <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 pb-16">
+        <main className="flex-1 min-w-0 max-w-7xl w-full mx-auto p-3 sm:p-4 md:p-6 pb-12 sm:pb-16">
           {activeView === 'OVERVIEW' && <MissionDashboard onNavigate={setActiveView} />}
           {activeView === 'ORBIT' && <OrbitModule />}
           {activeView === 'ADCS' && <ADCSModule />}
@@ -73,18 +76,19 @@ export default function App() {
           {activeView === 'COMMS' && <CommsModule />}
           {activeView === 'DEBRIS' && <DebrisModule />}
           {activeView === 'TELEMETRY' && <TelemetryStream />}
+          {activeView === 'DATA_SOURCES' && <DataSourcesModule />}
           {activeView === 'DOCS' && <DocumentationModule />}
         </main>
 
         {/* Quiet Aerospace Engineering Footer */}
-        <footer className="w-full border-t border-slate-900 bg-slate-950/80 py-4 px-6 text-xs text-slate-400">
-          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
+        <footer className="w-full border-t border-slate-900 bg-slate-950/80 px-4 py-4 text-xs text-slate-400 sm:px-6">
+          <div className="max-w-7xl mx-auto flex min-w-0 flex-col items-center justify-between gap-2 sm:flex-row">
+            <div className="flex min-w-0 items-center gap-2">
               <span className="font-semibold text-slate-400">PCSS II CUBESAT SIMULATOR</span>
-              <span>·</span>
-              <span>High-Fidelity 3U/6U CubeSat Virtual Twin & Orbital Dynamics Simulator</span>
+              <span className="hidden sm:inline">·</span>
+              <span className="hidden truncate sm:inline">High-Fidelity 3U/6U CubeSat Virtual Twin & Orbital Dynamics Simulator</span>
             </div>
-            <div className="font-mono text-[11px] text-slate-400 flex items-center gap-3">
+            <div className="hidden font-mono text-[11px] text-slate-400 md:flex md:items-center md:gap-3">
               <span>WGS-84 / ECI J2000</span>
               <span>·</span>
               <span>SGP4 KEPLERIAN PROPAGATOR</span>

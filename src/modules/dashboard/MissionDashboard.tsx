@@ -42,6 +42,7 @@ export const MissionDashboard: React.FC<MissionDashboardProps> = ({ onNavigate }
   const switchSatellite = useSimulatorStore((s) => s.switchSatellite);
   const { data: logs } = useMissionLogQuery();
   const [showSystemDetails, setShowSystemDetails] = useState(false);
+  const [showTelemetryDetails, setShowTelemetryDetails] = useState(false);
 
   const criticalConj = conjunctions.find((c) => c.severity === 'CRITICAL' || c.severity === 'WARNING');
   const velKmS = Math.sqrt(
@@ -69,6 +70,7 @@ export const MissionDashboard: React.FC<MissionDashboardProps> = ({ onNavigate }
             {criticalConj ? 'Review safety alert' : 'Explore live orbit'}
             <ArrowRight className="h-4 w-4" />
           </button>
+          <button onClick={() => onNavigate('DATA_SOURCES')} className="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-200 transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400">Data sources</button>
         </div>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2">
           <div className="rounded-lg border border-slate-800 bg-slate-950/50 px-3 py-2">
@@ -123,8 +125,24 @@ export const MissionDashboard: React.FC<MissionDashboardProps> = ({ onNavigate }
         <OrbitView3D />
       </section>
 
-      {/* Critical Telemetry Metrics Grid */}
-      <section aria-label="Key mission metrics" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      {/* Essential signals come first; engineering detail is available without competing with the primary mission decision. */}
+      <section aria-label="Mission indicators">
+        <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-300">Mission indicators</h2>
+            <p className="mt-1 text-xs text-slate-400">The mission pulse calls out safety first. These three signals summarize altitude, velocity, and energy reserve.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowTelemetryDetails((value) => !value)}
+            aria-expanded={showTelemetryDetails}
+            className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-lg border border-slate-700 px-3 py-2 text-xs font-medium text-cyan-300 transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 sm:self-auto"
+          >
+            {showTelemetryDetails ? 'Hide engineering detail' : 'Show engineering detail'}
+            {showTelemetryDetails ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+          </button>
+        </div>
+        <div className={`grid grid-cols-1 gap-3 sm:grid-cols-3 ${showTelemetryDetails ? 'lg:grid-cols-6' : 'lg:grid-cols-3'}`}>
         {/* Metric 1: Orbital Altitude */}
         <div className="bg-slate-900/50 border border-slate-800/80 rounded-xl p-3 flex flex-col justify-between">
           <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Altitude (LEO)</div>
@@ -158,6 +176,7 @@ export const MissionDashboard: React.FC<MissionDashboardProps> = ({ onNavigate }
           </div>
         </div>
 
+        {showTelemetryDetails && <>
         {/* Metric 4: Solar Generation */}
         <div className="bg-slate-900/50 border border-slate-800/80 rounded-xl p-3 flex flex-col justify-between">
           <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Solar Array</div>
@@ -195,6 +214,8 @@ export const MissionDashboard: React.FC<MissionDashboardProps> = ({ onNavigate }
           <div className="text-[10px] text-slate-400 font-mono">
             Station: {comms.activeGroundStation?.name.split(' ')[0] || 'None'}
           </div>
+        </div>
+        </>}
         </div>
       </section>
 

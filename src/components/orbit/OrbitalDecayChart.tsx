@@ -10,6 +10,8 @@ import {
   Legend,
   ReferenceLine,
 } from 'recharts';
+import { ChartInteractionHint, ChartNavigator } from '../charts/ChartNavigator';
+import { ChartViewport } from '../charts/ChartViewport';
 import { useSimulatorStore } from '../../core/store/useSimulatorStore';
 import { HarrisPriesterPhysics, ScenarioDecayCurve } from '../../core/math/harrisPriester';
 import { TrendingDown, Calendar, AlertTriangle, ShieldCheck, Zap } from 'lucide-react';
@@ -184,7 +186,8 @@ export const OrbitalDecayChart: React.FC = () => {
       </div>
 
       {/* Recharts Multi-Scenario Trajectory Line Chart */}
-      <div className="h-72 w-full pt-1">
+      <ChartViewport title="Orbital altitude decay projection" className="h-72 w-full pt-1">
+        <ChartInteractionHint />
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 10, right: 25, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
@@ -269,9 +272,10 @@ export const OrbitalDecayChart: React.FC = () => {
                 />
               );
             })}
+            <ChartNavigator dataKey="label" />
           </LineChart>
         </ResponsiveContainer>
-      </div>
+      </ChartViewport>
 
       {/* Scenario Lifetime Comparison Diagnostic Matrix */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 font-mono text-xs">

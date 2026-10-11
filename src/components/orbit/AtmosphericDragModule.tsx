@@ -37,6 +37,7 @@ export const AtmosphericDragModule: React.FC = () => {
   const executeReboost = useSimulatorStore((s) => s.executeDragReboostManeuver);
   const propulsion = useSimulatorStore((s) => s.propulsion);
   const history = useSimulatorStore((s) => s.history);
+  const selectedSatellite = useSimulatorStore((s) => s.selectedSatellite);
 
   const [activeTab, setActiveTab] = useState<ActiveViewTab>('DECAY_PROJECTION');
 
@@ -400,7 +401,7 @@ export const AtmosphericDragModule: React.FC = () => {
                     : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
                 }`}
               >
-                Feathered (0.01)
+                Feathered ({(selectedSatellite.geometry.nominalDragAreaM2 * 0.55).toFixed(3)})
               </button>
               <button
                 type="button"
@@ -411,7 +412,7 @@ export const AtmosphericDragModule: React.FC = () => {
                     : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
                 }`}
               >
-                Nominal 3U (0.03)
+                Nominal {selectedSatellite.formFactor} ({selectedSatellite.geometry.nominalDragAreaM2.toFixed(3)})
               </button>
               <button
                 type="button"
@@ -422,7 +423,7 @@ export const AtmosphericDragModule: React.FC = () => {
                     : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
                 }`}
               >
-                Broadside (0.05)
+                Broadside ({selectedSatellite.geometry.broadsideDragAreaM2.toFixed(3)})
               </button>
               <button
                 type="button"
@@ -433,7 +434,7 @@ export const AtmosphericDragModule: React.FC = () => {
                     : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
                 }`}
               >
-                Drag Sail (0.12)
+                Drag Sail ({Math.max(selectedSatellite.geometry.broadsideDragAreaM2 * 2.5, 0.05).toFixed(3)})
               </button>
             </div>
           </div>

@@ -4,7 +4,7 @@ import {
   ManeuverDirection,
   ThrusterManeuverConfig,
 } from '../../types/telemetry';
-import { PropulsionPhysics, CUBESAT_DRY_MASS_KG } from '../../core/math/propulsion';
+import { PropulsionPhysics } from '../../core/math/propulsion';
 import {
   Rocket,
   Zap,
@@ -39,6 +39,8 @@ import {
   CartesianGrid,
   Legend,
 } from 'recharts';
+import { ChartInteractionHint, ChartNavigator } from '../charts/ChartNavigator';
+import { ChartViewport } from '../charts/ChartViewport';
 
 export const ADCSThrusterControl: React.FC = () => {
   const propulsion = useSimulatorStore((s) => s.propulsion);
@@ -47,6 +49,7 @@ export const ADCSThrusterControl: React.FC = () => {
   const adcs = useSimulatorStore((s) => s.adcs);
   const history = useSimulatorStore((s) => s.history);
   const isPlaying = useSimulatorStore((s) => s.isPlaying);
+  const selectedSatellite = useSimulatorStore((s) => s.selectedSatellite);
 
   const armThruster = useSimulatorStore((s) => s.armThruster);
   const setThrusterConfig = useSimulatorStore((s) => s.setThrusterConfig);
@@ -73,10 +76,10 @@ export const ADCSThrusterControl: React.FC = () => {
       config.thrustMilliNewtons,
       config.specificImpulseSec,
       propulsion.propellantMassGrams,
-      CUBESAT_DRY_MASS_KG,
+      selectedSatellite.massKg,
       config.valveHeatingEnabled
     );
-  }, [config, propulsion.propellantMassGrams]);
+  }, [config, propulsion.propellantMassGrams, selectedSatellite.massKg]);
 
   // Power breakdown during firing vs standby
   const powerBreakdown = useMemo(() => {
@@ -237,9 +240,9 @@ export const ADCSThrusterControl: React.FC = () => {
         </div>
 
         {/* Top Control Buttons & Safety Interlock Switch */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
           {/* Tab Selector */}
-          <div className="flex bg-slate-900 border border-slate-800 rounded-lg p-0.5 text-xs">
+          <div className="flex flex-wrap bg-slate-900 border border-slate-800 rounded-lg p-0.5 text-xs">
             <button
               onClick={() => setActiveTab('CONTROLS')}
               className={`px-3 py-1.5 rounded-md font-medium transition-all ${
@@ -771,8 +774,8 @@ export const ADCSThrusterControl: React.FC = () => {
               <div className="py-4 relative flex flex-col items-center">
                 {/* CubeSat Body Representation */}
                 <div className="w-36 h-20 bg-slate-900 border-2 border-slate-700 rounded-lg flex flex-col items-center justify-center shadow-lg relative">
-                  <span className="text-[10px] font-mono text-slate-400 font-bold">3U CUBESAT BUS</span>
-                  <span className="text-[9px] font-mono text-cyan-400">Mass: {(CUBESAT_DRY_MASS_KG + propulsion.propellantMassGrams / 1000).toFixed(2)} kg</span>
+                  <span className="text-[10px] font-mono text-slate-400 font-bold">{selectedSatellite.formFactor} CUBESAT BUS</span>
+                  <span className="text-[9px] font-mono text-cyan-400">Mass: {(selectedSatellite.massKg + propulsion.propellantMassGrams / 1000).toFixed(2)} kg</span>
 
                   {/* Reaction Wheels icon */}
                   <div className="absolute top-1 right-2 flex items-center gap-1 text-[9px] text-slate-400 font-mono">
@@ -946,7 +949,8 @@ export const ADCSThrusterControl: React.FC = () => {
               </div>
             </div>
 
-            <div className="h-64 w-full">
+            <ChartViewport title="Thruster and EPS telemetry" className="h-64 w-full">
+              <ChartInteractionHint compact />
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={telemetryPoints}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
@@ -992,9 +996,10 @@ export const ADCSThrusterControl: React.FC = () => {
                     dot={false}
                     name="Propellant Mass (g)"
                   />
+                  <ChartNavigator dataKey="time" />
                 </ComposedChart>
               </ResponsiveContainer>
-            </div>
+            </ChartViewport>
           </div>
 
           {/* Battery Safety Threshold & Max Allowable Burn Time Gauge */}

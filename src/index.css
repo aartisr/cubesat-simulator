@@ -56,12 +56,19 @@
 
 html {
   background: var(--app-canvas);
+  overflow-x: hidden;
 }
 
 body {
   min-width: 320px;
+  overflow-x: hidden;
   background: var(--app-canvas);
   color: var(--app-text);
+}
+
+#root {
+  min-width: 0;
+  overflow-x: clip;
 }
 
 /* Shared primitives for new UI work; use these rather than per-page hex values. */
@@ -71,6 +78,16 @@ body {
   .ui-panel-raised { background: var(--app-surface-raised); border: 1px solid var(--app-border); border-radius: 0.75rem; }
   .ui-muted { color: var(--app-text-muted); }
   .ui-focus:focus-visible { outline: 2px solid var(--app-focus); outline-offset: 2px; }
+  .responsive-scroll { overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+}
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Recharts and SVG layouts must be allowed to shrink inside responsive grid cells. */
+.recharts-responsive-container,
+.recharts-wrapper {
+  min-width: 0;
 }
 
 /* Respect motion sensitivity for animated telemetry, maps, and alert indicators. */

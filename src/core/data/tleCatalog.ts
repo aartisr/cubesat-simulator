@@ -9,19 +9,53 @@ export interface SatellitePreset {
   massKg: number;
   batteryCapacityWh: number;
   solarCapacityW: number;
+  /** Deployed-envelope assumptions used by the visual, power, and drag models. */
+  geometry: CubeSatGeometry;
   initialElements: KeplerianElements;
 }
+
+export interface CubeSatGeometry {
+  /** Cal Poly CDS-compatible stowed body envelope, aligned to body X/Y/Z. */
+  bodyDimensionsM: { x: number; y: number; z: number };
+  /** Reference area for nominal velocity-aligned flight; broadside applies when deliberately presented. */
+  nominalDragAreaM2: number;
+  broadsideDragAreaM2: number;
+  /** One deployed wing on each side of the spacecraft body. */
+  solarWing: { spanM: number; chordM: number };
+}
+
+const GEOMETRY_1U: CubeSatGeometry = {
+  bodyDimensionsM: { x: 0.1, y: 0.1135, z: 0.1 },
+  nominalDragAreaM2: 0.01135,
+  broadsideDragAreaM2: 0.01135,
+  solarWing: { spanM: 0.10, chordM: 0.10 },
+};
+
+const GEOMETRY_3U: CubeSatGeometry = {
+  bodyDimensionsM: { x: 0.1, y: 0.3405, z: 0.1 },
+  nominalDragAreaM2: 0.03405,
+  broadsideDragAreaM2: 0.03405,
+  solarWing: { spanM: 0.18, chordM: 0.30 },
+};
+
+const GEOMETRY_6U: CubeSatGeometry = {
+  bodyDimensionsM: { x: 0.2263, y: 0.366, z: 0.1 },
+  nominalDragAreaM2: 0.0366,
+  broadsideDragAreaM2: 0.0828258,
+  solarWing: { spanM: 0.24, chordM: 0.34 },
+};
 
 export const CUBESAT_PRESETS: SatellitePreset[] = [
   {
     id: 'pcss-ii',
     name: 'PCSS-II (Virtual Twin)',
-    formFactor: '3U',
+    formFactor: '1U',
     noradId: 58920,
-    missionDescription: 'Autonomous 3U CubeSat carrying hyper-spectral Earth Imager & autonomous collision avoidance reaction wheel package.',
-    massKg: 4.85,
-    batteryCapacityWh: 40.0,
-    solarCapacityW: 18.5,
+    missionDescription: 'PCSS II 1U technology demonstrator with a compact Earth-observation payload, attitude control, and autonomous conjunction-analysis simulation.',
+    massKg: 1.25,
+    batteryCapacityWh: 10.0,
+    solarCapacityW: 5.0,
+    geometry: GEOMETRY_1U,
     initialElements: {
       semiMajorAxis: 6898.137, // ~520 km altitude
       eccentricity: 0.0012,
@@ -44,6 +78,7 @@ export const CUBESAT_PRESETS: SatellitePreset[] = [
     massKg: 5.2,
     batteryCapacityWh: 50.0,
     solarCapacityW: 24.0,
+    geometry: GEOMETRY_3U,
     initialElements: {
       semiMajorAxis: 6878.137, // ~500 km
       eccentricity: 0.0018,
@@ -66,6 +101,7 @@ export const CUBESAT_PRESETS: SatellitePreset[] = [
     massKg: 5.0,
     batteryCapacityWh: 30.0,
     solarCapacityW: 14.0,
+    geometry: GEOMETRY_3U,
     initialElements: {
       semiMajorAxis: 7098.137, // ~720 km
       eccentricity: 0.0055,
@@ -88,6 +124,7 @@ export const CUBESAT_PRESETS: SatellitePreset[] = [
     massKg: 13.5,
     batteryCapacityWh: 95.0,
     solarCapacityW: 42.0,
+    geometry: GEOMETRY_6U,
     initialElements: {
       semiMajorAxis: 7178.137, // ~800 km
       eccentricity: 0.0025,
